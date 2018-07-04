@@ -1,0 +1,32 @@
+{ 
+  "kr": { 
+    "home": "홈", 
+    "language": "English",
+    "sight": "관광지",
+    "art": "문화, 예술, 역사",
+    "festival": "축제, 공연",
+    "activity": "액티비티",
+    "shopping": "쇼핑",
+    "foods": "먹거리",
+    "all": "전체",
+    "seoguipo": "서귀포",
+    "jeju": "제주",
+    "godetails": "상세정보",
+    "zipcode": "우편번호"
+  },
+  "en": {
+    "home": "Home",
+    "language": "한국어",
+    "sight": "Sight seeing",
+    "art": "Art, History",
+    "festival": "Festivals",
+    "activity": "Activities",
+    "shopping": "Shopping",
+    "foods": "Foods",
+    "all": "All",
+    "seoguipo": "Seoguipo",
+    "jeju": "Jeju",
+    "godetails": "Details",
+    "zipcode": "Zip Code"
+  }
+}
