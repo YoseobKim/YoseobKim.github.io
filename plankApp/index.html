@@ -10,5 +10,5 @@
     for(var i = 0; i < favicons.length; i++) {
       var favicon = favicons[i];
       var href = new URL(favicon.href);
-      console.log(href);
+      favicon.href = href.origin + pathname + href.pathname;
     } </script> <meta name=theme-color content=#ffffff> <script type=text/javascript src=components/loader.js></script> <link rel=stylesheet type=text/css href=components/loader.css> <link href=app.css rel=stylesheet></head> <body> <div id=app></div> <script type=text/javascript src=vendor.bundle.js></script><script type=text/javascript src=app.bundle.js></script></body> </html> 
