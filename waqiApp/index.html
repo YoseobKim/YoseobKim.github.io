@@ -84,13 +84,13 @@
       #target {
         width: 345px;
       }
-	  .foot {
+      .foot {
         border-top: 1px solid #999999;
         position:fixed;
         height: 50%;
         z-index: 10000;
         text-align:center;
-        font-size:18px;
+        font-size:15px;
         color: #000;
         background: #FFF;
         justify-content: center; /* align horizontal */
@@ -102,82 +102,81 @@
         margin-left: auto;
         top: 94%;
       }
-
       .slide-up {
         top: 50% !important;
       }
-
       .slide-down {
         top: 94% !important;
       }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
   </head>
   <body>
     <div class="input-group mb-3">
       <input type="text" class="form-control" placeholder="Search Place..." aria-label="Place" aria-describedby="basic-addon1" id="pac-input">
-	  <div class="input-group-append">
-	    <select class="custom-select" id="criteria-select" aria-label="criteris-select">
+      <div class="input-group-append">
+        <select class="custom-select" id="criteria-select" aria-label="criteris-select">
           <option value="0" selected>WHO</option>
           <option value="1">South Korea</option>
         </select>
-	  </div>
+      </div>
     </div>
     <div id="map"></div>
-	<div class="foot w-75">
-	  <div class="w-100">
+    <div class="foot w-75">
+      <div class="w-100">
         <p>Click here to check details</p>
-	  </div>
-	  <hr/>
-	  <div class="mb-1" id="cityname-label">
-	    <b>City Name</b>
-	  </div>
-	  <div class="mb-1" id="status-label">
-	    <b>Status</b>
-	  </div>
-	  <div class="d-flex flex-row bd-highlight mb-1">
+      </div>
+      <hr/>
+      <div class="mb-1" id="cityname-label">
+        <b>City Name</b>
+      </div>
+      <div class="mb-1" id="status-label">
+        <b>Status</b>
+      </div>
+      <div class="d-flex flex-row mb-1">
         <small class="w-25">aqi</small>
-	    <div class="progress w-75 mr-1" id="aqi-progress">
+        <div class="progress w-75 mr-1" id="aqi-progress">
         </div>
-	  </div>
-	  <div class="d-flex flex-row bd-highlight mb-1">
+      </div>
+      <div class="d-flex flex-row mb-1">
         <small class="w-25">pm10</small>
-	    <div class="progress w-75 mr-1" id="pm10-progress">
+        <div class="progress w-75 mr-1" id="pm10-progress">
         </div>
-	  </div>
-      <div class="d-flex flex-row bd-highlight mb-1">
-	    <small class="w-25">pm2.5</small>
-	    <div class="progress w-75 mr-1" id="pm25-progress">
+      </div>
+      <div class="d-flex flex-row mb-1">
+        <small class="w-25">pm2.5</small>
+        <div class="progress w-75 mr-1" id="pm25-progress">
         </div>
-	  </div>
-	  <div class="d-flex flex-row bd-highlight mb-1">
-	    <small class="w-25">co2</small>
-	    <div class="progress w-75 mr-1" id="co-progress">
+      </div>
+      <div class="d-flex flex-row mb-1">
+        <small class="w-25">co2</small>
+        <div class="progress w-75 mr-1" id="co-progress">
         </div>
-	  </div>
-	  <div class="d-flex flex-row bd-highlight mb-1">
-	    <small class="w-25">o3</small>
-	    <div class="progress w-75 mr-1" id="o3-progress">
+      </div>
+      <div class="d-flex flex-row mb-1">
+        <small class="w-25">o3</small>
+        <div class="progress w-75 mr-1" id="o3-progress">
         </div>
-	  </div>
-	  <div class="d-flex flex-row bd-highlight mb-1">
-	    <small class="w-25">no2</small>
-	    <div class="progress w-75 mr-1" id="no2-progress">
+      </div>
+      <div class="d-flex flex-row mb-1">
+        <small class="w-25">no2</small>
+        <div class="progress w-75 mr-1" id="no2-progress">
         </div>
-	  </div>
-	  <div id="data-time-label">
-	    <p>Data Synced</p>
-	  </div>
+      </div>
+      <div id="data-time-label">
+        <p>Data Synced</p>
+      </div>
     </div>
     <script>
       var map;
       var heatmap;
       var markers = [];
-	  var heatmapData = [];
-	  var aqiDetail;
+      var heatmapData = [];
+      var aqiDetail;
        
       const TOKEN = "80860687b4b6c03df2a8c5e1b9a895275abc368d";
       const RADIUS_XS = 70;
@@ -189,13 +188,13 @@
       const ZOOM_LEVEL = 12;
       const MAX_INTENSITY_AQI = 300;
       // http://wiki.mossol.net/display/TOK/Planning+For+AqiTracer#PlanningForAqiTracer-AQIReference
-	  const MAX_INTENSITY_PM10 = 100;
-	  const MAX_INTENSITY_PM25 = 50;
-	  
-	  // marker svg
+      const MAX_INTENSITY_PM10 = 100;
+      const MAX_INTENSITY_PM25 = 50;
+      
+      // marker svg
       const SQUARE_PIN = "M22-48h-44v43h16l6 5 6-5h16z";
-	  
-	  // colors
+      
+      // colors
       const AQI_GOOD_COLOR = 'rgba(31, 168, 235, 1)';
       const AQI_MODERATE_COLOR = 'rgba(46, 204, 113, 1)';
       const AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR = 'rgba(247, 220, 111, 1)';
@@ -211,69 +210,69 @@
         AQI_VERY_UNHEARTHY_COLOR,
         AQI_HAZARDOUS_COLOR,
       ];
-	  
+      
       // WHO standards
-	  const WHO_AQI = [
-	    50.0,
+      const WHO_AQI = [
+        50.0,
         100.0,
         150.0,
         200.0,
         300.0,
         500.0
       ];
-	  // S.Korea standards
-	  const S_KOREA_AQI = [
-	    50.0,
-		100.0,
-		150.0,
-		250.0,
-		350.0,
-		500.0
-	  ];
-	  const AQI_CRITERIA_LIST = [
-	    WHO_AQI,
-		S_KOREA_AQI
-	  ];
-	  // WHO standards
-	  const WHO_PM10 = [
-	    30.0,
-		50.0,
-		100.0
-	  ];
-	  // S.Korea standards	  
-	  const S_KOREA_PM10 = [
-	    30.0,
-		80.0,
-		150.0
-	  ];
-	  const PM10_CRITERIA_LIST = [
-	    WHO_PM10,
-		S_KOREA_PM10
-	  ];
-	  // WHO standards
-	  const WHO_PM25 = [
-	    15.0,
-		25.0,
-		50.0
+      // S.Korea standards
+      const S_KOREA_AQI = [
+        50.0,
+        100.0,
+        150.0,
+        250.0,
+        350.0,
+        500.0
       ];
-	  // S.Korea standards
-	  const S_KOREA_PM25 = [
-	    15.0,
-		35.0,
-		75.0
-	  ];
-	  const PM25_CRITERIA_LIST = [
-	    WHO_PM25,
-		S_KOREA_PM25
-	  ];
-	  
-	  const AQI_GOOD_IDX = 0;
-	  const AQI_MODERATE_IDX = 1;
-	  const AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX = 2;
-	  const AQI_UNHEARTHY_IDX = 3;
-	  const AQI_VERY_UNHEARTHY_IDX = 4;
-	  const AQI_HAZARDOUS_IDX = 5;
-	  
+      const AQI_CRITERIA_LIST = [
+        WHO_AQI,
+        S_KOREA_AQI
+      ];
+      // WHO standards
+      const WHO_PM10 = [
+        30.0,
+        50.0,
+        100.0
+      ];
+      // S.Korea standards    
+      const S_KOREA_PM10 = [
+        30.0,
+        80.0,
+        150.0
+      ];
+      const PM10_CRITERIA_LIST = [
+        WHO_PM10,
+        S_KOREA_PM10
+      ];
+      // WHO standards
+      const WHO_PM25 = [
+        15.0,
+        25.0,
+        50.0
+      ];
+      // S.Korea standards
+      const S_KOREA_PM25 = [
+        15.0,
+        35.0,
+        75.0
+      ];
+      const PM25_CRITERIA_LIST = [
+        WHO_PM25,
+        S_KOREA_PM25
+      ];
+      
+      const AQI_GOOD_IDX = 0;
+      const AQI_MODERATE_IDX = 1;
+      const AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX = 2;
+      const AQI_UNHEARTHY_IDX = 3;
+      const AQI_VERY_UNHEARTHY_IDX = 4;
+      const AQI_HAZARDOUS_IDX = 5;
+      
       function convertToWeightedLatLngArray(aqiList) {
         var ret = [];
          
@@ -294,17 +293,17 @@
         return ret;
       }
       
-	  function clearMarkers() {
+      function clearMarkers() {
         if(markers != null && markers.length > 0) {
           for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(null);
           }
           markers = [];
         }
-	  }
-	  
-	  function getAQIColor(aqival, aqi_criteria) {
-	    if(aqival <= aqi_criteria[AQI_GOOD_IDX])
+      }
+      
+      function getAQIColor(aqival, aqi_criteria) {
+        if(aqival <= aqi_criteria[AQI_GOOD_IDX])
           return AQI_GOOD_COLOR;
         else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
           return AQI_MODERATE_COLOR;
@@ -316,10 +315,10 @@
           return AQI_VERY_UNHEARTHY_COLOR;
         else
           return AQI_HAZARDOUS_COLOR;
-	  }
-	  
-	  function getAQIString(aqival, aqi_criteria) {
-	    if(aqival <= aqi_criteria[AQI_GOOD_IDX])
+      }
+      
+      function getAQIString(aqival, aqi_criteria) {
+        if(aqival <= aqi_criteria[AQI_GOOD_IDX])
           return "좋음 (GOOD)";
         else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
           return "보통 (MODERATE)";
@@ -331,10 +330,10 @@
           return "매우 나쁨 (VERY UNHEARTHY)";
         else
           return "위험 (HAZARDOUS)";
-	  }
-	  
-	  function getPMColor(aqival, aqi_criteria) {
-	    if(aqival <= aqi_criteria[AQI_GOOD_IDX])
+      }
+      
+      function getPMColor(aqival, aqi_criteria) {
+        if(aqival <= aqi_criteria[AQI_GOOD_IDX])
           return AQI_GOOD_COLOR;
         else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
           return AQI_MODERATE_COLOR;
@@ -342,63 +341,63 @@
           return AQI_UNHEARTHY_COLOR;
         else
           return AQI_VERY_UNHEARTHY_COLOR;
-	  }
-	  
-	  function getWidthPercentage(val, max) {
-		width = val / max * 100;
-		width = width >= 100 ? 100 : width;
-		return width;
-	  }
-	  
-	  function drawDetails() {
+      }
+      
+      function getWidthPercentage(val, max) {
+        width = val / max * 100;
+        width = width >= 100 ? 100 : width;
+        return width;
+      }
+      
+      function drawDetails() {
         var selectorIndex = $("#criteria-select").val();
-		var aqi = aqiDetail.aqi;
-		const aqiCriteria = AQI_CRITERIA_LIST[selectorIndex];
-			
-		$('#cityname-label').html('<b>' + aqiDetail.city.name + '</b>');
-		$('#status-label').html('<small>' + getAQIString(aqi, aqiCriteria) + '</small>')
-		$('#data-time-label').html('<small class="muted"> Data Collected at : ' + aqiDetail.time.s + '</small>');
-		
-		var width = getWidthPercentage(aqi, MAX_INTENSITY_AQI);
+        var aqi = aqiDetail.aqi;
+        const aqiCriteria = AQI_CRITERIA_LIST[selectorIndex];
         var color = getAQIColor(aqi, aqiCriteria);
-		$('#aqi-progress').html(makeProgressBar(width, color, aqi));
-			
-		var iaqi = aqiDetail.iaqi;
-		var pm10 = iaqi.pm10.v;
-		width = getWidthPercentage(pm10, MAX_INTENSITY_AQI);
-		color = getAQIColor(pm10, aqiCriteria);
-		$('#pm10-progress').html(makeProgressBar(width, color, pm10));
-		
-		var pm25 = iaqi.pm25.v;
-		width = getWidthPercentage(pm25, MAX_INTENSITY_AQI);
-		color = getAQIColor(pm25, aqiCriteria);
-		$('#pm25-progress').html(makeProgressBar(width, color, pm25));
-
-		var co = iaqi.co.v;
-		width = getWidthPercentage(co, MAX_INTENSITY_AQI);
-		color = getAQIColor(co, aqiCriteria);
-		$('#co-progress').html(makeProgressBar(width, color, co));
-		
-		var o3 = iaqi.o3.v;
-		width = getWidthPercentage(o3, MAX_INTENSITY_AQI);
-		color = getAQIColor(o3, aqiCriteria);
-		$('#o3-progress').html(makeProgressBar(width, color, o3));
-		
-		var no2 = iaqi.no2.v;
-		width = getWidthPercentage(no2, MAX_INTENSITY_AQI);
-		color = getAQIColor(no2, aqiCriteria);
-		$('#no2-progress').html(makeProgressBar(width, color, no2));
-	}
-	  
-	  function drawMarkers() {
-	    // If marker is not empty, remove and initializae it.
-		clearMarkers();
-		
-	    heatmapData.forEach(function(item) {
+        var textStyle = 'style = "color: ' + color + ';"';
+            
+        $('#cityname-label').html('<b>' + aqiDetail.city.name + '</b>');
+        $('#status-label').html('<small ' + textStyle + '>' + getAQIString(aqi, aqiCriteria) + '</small>')
+        $('#data-time-label').html('<small class="muted"> Data Collected at : ' + aqiDetail.time.s + '</small>');
+        
+        var width = getWidthPercentage(aqi, MAX_INTENSITY_AQI);
+        $('#aqi-progress').html(makeProgressBar(width, color, aqi));
+            
+        var iaqi = aqiDetail.iaqi;
+        var pm10 = iaqi.pm10.v;
+        width = getWidthPercentage(pm10, MAX_INTENSITY_AQI);
+        color = getAQIColor(pm10, aqiCriteria);
+        $('#pm10-progress').html(makeProgressBar(width, color, pm10));
+        
+        var pm25 = iaqi.pm25.v;
+        width = getWidthPercentage(pm25, MAX_INTENSITY_AQI);
+        color = getAQIColor(pm25, aqiCriteria);
+        $('#pm25-progress').html(makeProgressBar(width, color, pm25));
+        var co = iaqi.co.v;
+        width = getWidthPercentage(co, MAX_INTENSITY_AQI);
+        color = getAQIColor(co, aqiCriteria);
+        $('#co-progress').html(makeProgressBar(width, color, co));
+        
+        var o3 = iaqi.o3.v;
+        width = getWidthPercentage(o3, MAX_INTENSITY_AQI);
+        color = getAQIColor(o3, aqiCriteria);
+        $('#o3-progress').html(makeProgressBar(width, color, o3));
+        
+        var no2 = iaqi.no2.v;
+        width = getWidthPercentage(no2, MAX_INTENSITY_AQI);
+        color = getAQIColor(no2, aqiCriteria);
+        $('#no2-progress').html(makeProgressBar(width, color, no2));
+    }
+      
+      function drawMarkers() {
+        // If marker is not empty, remove and initializae it.
+        clearMarkers();
+        
+        heatmapData.forEach(function(item) {
           var aqival = item.weight;
-	      var aqi_criteria = AQI_CRITERIA_LIST[$("#criteria-select").val()];
+          var aqi_criteria = AQI_CRITERIA_LIST[$("#criteria-select").val()];
           
-		  var color = getAQIColor(aqival, aqi_criteria);
+          var color = getAQIColor(aqival, aqi_criteria);
            
           if(aqival != null && !isNaN(aqival)) {
             var marker = new google.maps.Marker({
@@ -420,13 +419,13 @@
             markers.push(marker);
           }
         });
-	  }
-	  
-	  $("#criteria-select").change(function() {
+      }
+      
+      $("#criteria-select").change(function() {
         drawMarkers();
-		drawDetails();
-	  });
-	  $('.foot').click(function() {
+        drawDetails();
+      });
+      $('.foot').click(function() {
         if($(this).hasClass('slide-up')) {
           $(this).addClass('slide-down', 1000, 'easeOutExpo');
           $(this).removeClass('slide-up'); 
@@ -435,14 +434,14 @@
           $(this).addClass('slide-up', 1000, 'easeOutExpo'); 
         }
       });
-	   
-	  function makeProgressBar(width, color, val) {
+       
+      function makeProgressBar(width, color, val) {
         var style = 'style= "width: ' + width + '%; background-color: ' + color + ' !important;"';
-		var progressBarBegin = '<div class="progress-bar" role="progressbar" ';
-	    var progressBarEnd = '>' + val + '</div>';
-		return progressBarBegin + style + progressBarEnd;
-	  }	  
-	   
+        var progressBarBegin = '<div class="progress-bar" role="progressbar" ';
+        var progressBarEnd = '>' + val + '</div>';
+        return progressBarBegin + style + progressBarEnd;
+      }   
+       
       function initAutocomplete() {
         map = new google.maps.Map(document.getElementById('map'), {
           center: INITIAL_CENTER,
@@ -480,37 +479,36 @@
           map.fitBounds(bounds);
         });
         
-		// Try HTML5 geolocation.
+        // Try HTML5 geolocation.
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
             var pos = {
               lat: position.coords.latitude,
               lng: position.coords.longitude
             };
-
             map.setCenter(pos);
           }, function() {
-		    // fail
+            // fail
           });
         } else {
           // Browser doesn't support Geolocation
         }
-		
+        
         google.maps.event.addListener(map, 'idle', function() {
           var bounds =  map.getBounds();
           var ne = bounds.getNorthEast();
           var sw = bounds.getSouthWest();
-		  var center = bounds.getCenter();
+          var center = bounds.getCenter();
           // Bounds changed. Read changed bounds of the map.
           var latlngBoundsQuery = sw.lat() + "," + sw.lng() + "," + ne.lat() + "," + ne.lng();
-		  
-		  // Read details of the center area. This endpoint will return the nearest station and details from a given lat/lon.
-		  $.getJSON("https://api.waqi.info/feed/geo:" + center.lat() + ";" + center.lng() + "/?token=" + TOKEN, function(result) {
-		    console.log(result);
-			aqiDetail = result.data;
-			drawDetails();
-		  });
-		  
+          
+          // Read details of the center area. This endpoint will return the nearest station and details from a given lat/lon.
+          $.getJSON("https://api.waqi.info/feed/geo:" + center.lat() + ";" + center.lng() + "/?token=" + TOKEN, function(result) {
+            console.log(result);
+            aqiDetail = result.data;
+            drawDetails();
+          });
+          
           // Read aqi info from api. This endpoint will return all stations(and some sort of data) within a given boundary.
           $.getJSON("https://api.waqi.info/map/bounds/?token=" + TOKEN + "&latlng=" + latlngBoundsQuery, function(result){
             heatmapData = convertToWeightedLatLngArray(result);
@@ -537,8 +535,8 @@
               heatmap.set('radius', RADIUS_S);
             else
               heatmap.set('radius', RADIUS_XS);
-			
-			drawMarkers();
+            
+            drawMarkers();
           });
         });
       }
