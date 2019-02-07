@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <title>Places Search Box</title>
+    <title>World Air Quality App</title>
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -84,13 +84,17 @@
       #target {
         width: 345px;
       }
+      #cityname-label {
+        font-size: 14px;  
+      }
+	  
       .foot {
         border-top: 1px solid #999999;
         position:fixed;
         height: 50%;
         z-index: 10000;
         text-align:center;
-        font-size:15px;
+        font-size:14px;
         color: #000;
         background: #FFF;
         justify-content: center; /* align horizontal */
@@ -100,13 +104,26 @@
         left: 0;
         margin-right: auto;
         margin-left: auto;
-        top: 94%;
+        top: 87%;
       }
       .slide-up {
         top: 50% !important;
       }
       .slide-down {
-        top: 94% !important;
+        top: 87% !important;
+      }
+      div.scrollmenu {
+        background-color: #E8E5E5;
+        overflow: auto;
+        white-space: nowrap;
+      }
+
+      div.scrollmenu li {
+        display: inline-block;
+        color: white;
+        text-align: center;
+        padding: 1%;
+        text-decoration: none;
       }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -114,10 +131,16 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   </head>
   <body>
-    <div class="input-group mb-3">
-      <input type="text" class="form-control" placeholder="Search Place..." aria-label="Place" aria-describedby="basic-addon1" id="pac-input">
+    <div class="input-group mb-0">
+      <div class="input-group-prepend">
+        <button class="btn btn-secondary btn-sm" type="button" id="curpos-btn">
+          <i class="fas fa-crosshairs"></i>
+        </button>
+      </div>
+      <input type="text" class="form-control" onfocus="this.value=''" placeholder="Search Place..." aria-label="Place" aria-describedby="basic-addon1" id="pac-input">
       <div class="input-group-append">
         <select class="custom-select" id="criteria-select" aria-label="criteris-select">
           <option value="0" selected>WHO</option>
@@ -125,18 +148,20 @@
         </select>
       </div>
     </div>
+    <div class="scrollmenu">
+    </div>
     <div id="map"></div>
     <div class="foot w-75">
-      <div class="w-100">
-        <p>Click here to check details</p>
+      <div class="w-100" style="height: 100px;" id="foot-header">
+        <b class="mb-1">Click here to check details</b>
+        <div id="cityname-label">
+          <p class="mb-1">City Name</p>
+        </div>
+        <div class="mb-1" id="status-label">
+          <b>Status</b>
+        </div>
       </div>
-      <hr/>
-      <div class="mb-1" id="cityname-label">
-        <b>City Name</b>
-      </div>
-      <div class="mb-1" id="status-label">
-        <b>Status</b>
-      </div>
+      <hr class="mb-1 mt-1"/>
       <div class="d-flex flex-row mb-1">
         <small class="w-25">aqi</small>
         <div class="progress w-75 mr-1" id="aqi-progress">
@@ -168,8 +193,11 @@
         </div>
       </div>
       <div id="data-time-label">
-        <p>Data Synced</p>
+        <p>Data Collected at : </p>
       </div>
+      <button type="button" class="btn btn-success btn m-2" id="add-to-favorite-btn">
+        <i class="fas fa-star"></i> Add to favorite
+      </button>
     </div>
     <script>
       var map;
@@ -177,7 +205,15 @@
       var markers = [];
       var heatmapData = [];
       var aqiDetail;
-       
+      var favoriteList = localStorage.getItem("aqiFavoritesGeo");
+      favoriteList = favoriteList == null ? [] : JSON.parse(favoriteList);
+	  localStorage.setItem("aqiFavoritesGeo", JSON.stringify(favoriteList));
+
+      for(var i = 0; i < favoriteList.length; i++) {
+        var item = favoriteList[i];
+        drawFavoriteItem(item);
+      }
+	  
       const TOKEN = "80860687b4b6c03df2a8c5e1b9a895275abc368d";
       const RADIUS_XS = 70;
       const RADIUS_S = 80;
@@ -356,9 +392,12 @@
         var color = getAQIColor(aqi, aqiCriteria);
         var textStyle = 'style = "color: ' + color + ';"';
             
-        $('#cityname-label').html('<b>' + aqiDetail.city.name + '</b>');
-        $('#status-label').html('<small ' + textStyle + '>' + getAQIString(aqi, aqiCriteria) + '</small>')
-        $('#data-time-label').html('<small class="muted"> Data Collected at : ' + aqiDetail.time.s + '</small>');
+        $('#cityname-label').html('<p class="mb-1">' + aqiDetail.city.name + '</p>');
+        $('#status-label').html('<b ' + textStyle + '>' + getAQIString(aqi, aqiCriteria) + '</b>');
+        var dataCollectedAt = '<small class="muted"> Data Collected at : ' + aqiDetail.time.s + '</small><br/>';
+		dataCollectedAt += '<small class="muted">' + aqiDetail.attributions[0].name + ' - ';
+        dataCollectedAt += aqiDetail.attributions[0].url + '</small><br/>';
+        $('#data-time-label').html(dataCollectedAt);
         
         var width = getWidthPercentage(aqi, MAX_INTENSITY_AQI);
         $('#aqi-progress').html(makeProgressBar(width, color, aqi));
@@ -387,7 +426,7 @@
         width = getWidthPercentage(no2, MAX_INTENSITY_AQI);
         color = getAQIColor(no2, aqiCriteria);
         $('#no2-progress').html(makeProgressBar(width, color, no2));
-    }
+      }
       
       function drawMarkers() {
         // If marker is not empty, remove and initializae it.
@@ -416,32 +455,112 @@
 //              color: color
               }
             });
+			
+			marker.addListener('click', function() {
+			  map.setCenter(marker.getPosition());
+			})
             markers.push(marker);
           }
         });
+      }
+      
+      function drawFavoriteItem(cityItem) {
+        var name = cityItem.name.split(",")[0];
+        var id = "pos-" + name + "-btn"
+        var posBtn = 
+          $('<button class="btn btn-outline-primary btn-sm" type="button" id="' + id + '">' +
+              name + 
+            '</button>');
+		var deleteBtn = 
+          $('<button type="button" class="btn btn-secondary btn-sm" id="' + id + '-close">' + 
+              '<span aria-hidden="true">&times;</span>' + 
+            '</button>');
+        var btnGroup = 
+          $('<div class="btn-group" role="group" aria-label="btn-group"></div>');
+        btnGroup.append(posBtn);
+        btnGroup.append(deleteBtn);
+
+        var item = $('<li></li>');
+        item.append(btnGroup);
+
+        posBtn.on('click', function() {
+          var cityGeo = cityItem.geo;
+          var center = {lat: cityGeo[0], lng: cityGeo[1]};
+          map.setCenter(center);
+        });
+
+        deleteBtn.on('click', function() {
+          item.remove();
+          for(var i = 0; i < favoriteList.length; i++) {
+            var favorite = favoriteList[i];
+            if(favorite.name == cityItem.name) {
+              favoriteList.splice(i, 1);
+              localStorage.setItem("aqiFavoritesGeo", JSON.stringify(favoriteList));
+              break;
+            }
+          }
+        });
+
+        $('.scrollmenu').append(item);
       }
       
       $("#criteria-select").change(function() {
         drawMarkers();
         drawDetails();
       });
-      $('.foot').click(function() {
-        if($(this).hasClass('slide-up')) {
-          $(this).addClass('slide-down', 1000, 'easeOutExpo');
-          $(this).removeClass('slide-up'); 
+
+      $('#foot-header').click(function() {
+        if($('.foot').hasClass('slide-up')) {
+          $('.foot').addClass('slide-down', 1000, 'easeOutExpo');
+          $('.foot').removeClass('slide-up'); 
         } else {
-          $(this).removeClass('slide-down');
-          $(this).addClass('slide-up', 1000, 'easeOutExpo'); 
+          $('.foot').removeClass('slide-down');
+          $('.foot').addClass('slide-up', 1000, 'easeOutExpo'); 
         }
       });
-       
+
+      $('#curpos-btn').click(function() {
+        moveToCurrentPos();
+      });
+
+      $('#add-to-favorite-btn').click(function() {
+        var city = aqiDetail.city;
+        var alreadyIn = false;
+        for(var i = 0; i < favoriteList.length; i++) {
+          var item = favoriteList[i];
+          if(item.name == city.name) alreadyIn = true;
+        }
+        if(!alreadyIn) {
+          favoriteList.push(city);
+          localStorage.setItem("aqiFavoritesGeo", JSON.stringify(favoriteList));
+          drawFavoriteItem(city);
+        }
+      });
+	  
       function makeProgressBar(width, color, val) {
         var style = 'style= "width: ' + width + '%; background-color: ' + color + ' !important;"';
         var progressBarBegin = '<div class="progress-bar" role="progressbar" ';
         var progressBarEnd = '>' + val + '</div>';
         return progressBarBegin + style + progressBarEnd;
       }   
-       
+      
+      function moveToCurrentPos() {
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            map.setCenter(pos);
+          }, function() {
+            // fail
+          });
+        } else {
+          // Browser doesn't support Geolocation
+        }
+      }	  
+	   
       function initAutocomplete() {
         map = new google.maps.Map(document.getElementById('map'), {
           center: INITIAL_CENTER,
@@ -478,21 +597,8 @@
           });
           map.fitBounds(bounds);
         });
-        
-        // Try HTML5 geolocation.
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(position) {
-            var pos = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            map.setCenter(pos);
-          }, function() {
-            // fail
-          });
-        } else {
-          // Browser doesn't support Geolocation
-        }
+
+        moveToCurrentPos();
         
         google.maps.event.addListener(map, 'idle', function() {
           var bounds =  map.getBounds();
