@@ -90,28 +90,40 @@
 	  
       .foot {
         border-top: 1px solid #999999;
-        position:fixed;
-        height: 50%;
+        position:fixed !important;
+        height: 320px;
         z-index: 10000;
         text-align:center;
         font-size:14px;
         color: #000;
         background: #FFF;
         justify-content: center; /* align horizontal */
-        border-top-left-radius:25px;
-        border-top-right-radius:25px;
+        border-top-left-radius:10px !important;
+        border-top-right-radius:10px !important;
         right: 0;
         left: 0;
         margin-right: auto;
         margin-left: auto;
-        top: 87%;
+        bottom: -220px;
       }
+	  
+      .foot-header {
+        height: 100px;
+      }
+  
+      .tab-field {
+        border-top-left-radius:10px !important;
+        border-top-right-radius:10px !important;
+      }
+	  
       .slide-up {
-        top: 50% !important;
+        bottom: 0%;
       }
+	  
       .slide-down {
-        top: 87% !important;
+        bottom: -220px !important;
       }
+	  
       div.scrollmenu {
         background-color: #E8E5E5;
         overflow: auto;
@@ -134,6 +146,21 @@
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   </head>
   <body>
+    <!-- Modal -->
+    <div class="modal fade" id="crawled-by-modal" tabindex="-1" role="dialog" aria-labelledby="crawledByModal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="crawled-by-label">Data Collected By</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="crawled-by-content">
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="input-group mb-0">
       <div class="input-group-prepend">
         <button class="btn btn-secondary btn-sm" type="button" id="curpos-btn">
@@ -151,9 +178,9 @@
     <div class="scrollmenu">
     </div>
     <div id="map"></div>
-    <div class="foot w-75">
-      <div class="w-100" style="height: 100px;" id="foot-header">
-        <b class="mb-1">Click here to check details</b>
+    <div class="card foot w-75">
+      <div class="w-100 foot-header" id="foot-header">
+        <div class="mb-1 w-100 alert-dark tab-field"><b>Tap here to check details</b></div>
         <div id="cityname-label">
           <p class="mb-1">City Name</p>
         </div>
@@ -355,17 +382,17 @@
       
       function getAQIString(aqival, aqi_criteria) {
         if(aqival <= aqi_criteria[AQI_GOOD_IDX])
-          return "좋음 (GOOD)";
+          return "GOOD (좋음)";
         else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
-          return "보통 (MODERATE)";
+          return "MODERATE (보통)";
         else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
-          return "민감군에게 영향 (UNHEARTHY FOR SENSITIVE GROUPS)";
+          return "UNHEARTHY FOR SENSITIVE GROUPS (민감군에게 영향)";
         else if(aqival <= aqi_criteria[AQI_UNHEARTHY_IDX])
-          return "나쁨 (UNHEARTHY)";
+          return "UNHEARTHY (나쁨)";
         else if(aqival <= aqi_criteria[AQI_VERY_UNHEARTHY_IDX])
-          return "매우 나쁨 (VERY UNHEARTHY)";
+          return "VERY UNHEARTHY (매우 나쁨)";
         else
-          return "위험 (HAZARDOUS)";
+          return "HAZARDOUS (위험, 해로움)";
       }
       
       function getPMColor(aqival, aqi_criteria) {
@@ -394,10 +421,20 @@
             
         $('#cityname-label').html('<p class="mb-1">' + aqiDetail.city.name + '</p>');
         $('#status-label').html('<b ' + textStyle + '>' + getAQIString(aqi, aqiCriteria) + '</b>');
-        var dataCollectedAt = '<small class="muted"> Data Collected at : ' + aqiDetail.time.s + '</small><br/>';
-		dataCollectedAt += '<small class="muted">' + aqiDetail.attributions[0].name + ' - ';
-        dataCollectedAt += aqiDetail.attributions[0].url + '</small><br/>';
+        var dataCollectedAt = '<small class="muted"> Data Collected at : ' + aqiDetail.time.s +' </small>' + 
+        '<button type="button" class="btn btn-link btn-sm" data-toggle="modal" ' + 
+          'data-target="#crawled-by-modal">' + 
+          '<i class="fas fa-info-circle"></i>' + 
+        '</button>';
+		var crawled_by = '';
+        for(var i = 0; i < aqiDetail.attributions.length; i++) {
+          var item = aqiDetail.attributions[i];
+          crawled_by += '<li><small class="muted">' + item.name + ' - ';
+          crawled_by += '<a href="' + item.url + '">' + item.url + '</a></small></li>';
+        }
+		
         $('#data-time-label').html(dataCollectedAt);
+		$('#crawled-by-content').html(crawled_by);
         
         var width = getWidthPercentage(aqi, MAX_INTENSITY_AQI);
         $('#aqi-progress').html(makeProgressBar(width, color, aqi));
