@@ -1,691 +1,707 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
-  <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <meta charset="utf-8">
-    <title>World Air Quality App</title>
-    <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 90%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+  <script src="components/loader.js"></script>
+
+  <link rel="stylesheet" href="components/loader.css">
+  <title>Realtime World Air Quality Map</title>
+  <style>
+    /* Always set the map height explicitly to define the size of the div
+     * element that contains the map. */
+    #map {
+      height: 80%;
+    }
+    /* Optional: Makes the sample page fill the window. */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+     
+    #description {
+      font-family: Roboto;
+      font-size: 15px;
+      font-weight: 300;
+    }
+
+    #infowindow-content .title {
+      font-weight: bold;
+    }
+
+    #infowindow-content {
+      display: none;
+    }
+
+    #map #infowindow-content {
+      display: inline;
+    }
+
+    .pac-card {
+      margin: 10px 10px 0 0;
+      border-radius: 2px 0 0 2px;
+      box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      outline: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      background-color: #fff;
+      font-family: Roboto;
+    }
+
+    #pac-container {
+      padding-bottom: 12px;
+      margin-right: 12px;
+    }
+
+    .pac-controls {
+      display: inline-block;
+      padding: 5px 11px;
+    }
+
+    .pac-controls label {
+      font-family: Roboto;
+      font-size: 13px;
+      font-weight: 300;
+    }
+
+    #pac-input {
+      background-color: #fff;
+      font-family: Roboto;
+      font-size: 15px;
+      font-weight: 300;
+      text-overflow: ellipsis;
+    }
+
+    #pac-input:focus {
+      border-color: #4d90fe;
+    }
+
+    #title {
+      color: #fff;
+      background-color: #4d90fe;
+      font-size: 25px;
+      font-weight: 500;
+      padding: 6px 12px;
+    }
+    #target {
+      width: 345px;
+    }
+    #cityname-label {
+      font-size: 14px;  
+    }
+        
+    .foot {
+      border-top: 1px solid #999999;
+      position:fixed !important;
+      height: 320px;
+      z-index: 10000;
+      text-align:center;
+      font-size:14px;
+      color: #000;
+      background: #FFF;
+      justify-content: center; /* align horizontal */
+      border-top-left-radius:10px !important;
+      border-top-right-radius:10px !important;
+      right: 0;
+      left: 0;
+      margin-right: auto;
+      margin-left: auto;
+      bottom: -220px;
+    }
+        
+    .foot-header {
+      height: 100px;
+    }
+
+    .tab-field {
+      border-top-left-radius:10px !important;
+      border-top-right-radius:10px !important;
+    }
+        
+    .slide-up {
+      bottom: 0%;
+    }
+        
+    .slide-down {
+      bottom: -220px !important;
+    }
+        
+    div.scrollmenu {
+      background-color: #E8E5E5;
+      overflow: auto;
+      white-space: nowrap;
+    }
+
+    div.scrollmenu li {
+      display: inline-block;
+      color: white;
+      text-align: center;
+      padding: 1%;
+      text-decoration: none;
+    }
+    
+    .city-name-ellipsis {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;  
+      overflow: hidden;
+    }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+</head>
+<body>
+  <!-- Modal -->
+  <div class="modal fade" id="crawled-by-modal" tabindex="-1" role="dialog" aria-labelledby="crawledByModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="crawled-by-label">Data Collected By</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="crawled-by-content">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="input-group mb-0">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="fas fa-search"></i></span>
+    </div>
+    <input type="text" class="form-control" onfocus="this.value=''" placeholder="Search Place..." aria-label="Place" aria-describedby="basic-addon1" id="pac-input">
+    <div class="input-group-append">
+      <select class="custom-select" id="criteria-select" aria-label="criteris-select">
+        <option value="0" selected>WHO</option>
+        <option value="1">South Korea</option>
+      </select>
+    </div>
+  </div>
+  <div class="scrollmenu">
+    <li>
+      <button class="btn btn-secondary btn-sm" type="button" id="curpos-btn">
+        <i class="fas fa-location-arrow"></i>
+      </button>
+    </li>
+  </div>
+  <div id="map"></div>
+  <div class="card foot w-100">
+    <div class="w-100 foot-header" id="foot-header">
+      <div class="mb-1 w-100 alert-dark tab-field"><b>Tap here to check details</b></div>
+      <div id="cityname-label">
+        <p class="mb-1 city-name-ellipsis">City Name</p>
+      </div>
+      <div class="mb-1" id="status-label">
+        <b>Status</b>
+      </div>
+    </div>
+    <hr class="mb-1 mt-1"/>
+    <div class="d-flex flex-row mb-1">
+      <small class="w-25"><b>aqi</b></small>
+      <div class="progress w-75 mr-1" id="aqi-progress">
+      </div>
+    </div>
+    <div class="d-flex flex-row mb-1">
+      <small class="w-25">pm10</small>
+      <div class="progress w-75 mr-1" id="pm10-progress">
+      </div>
+    </div>
+    <div class="d-flex flex-row mb-1">
+      <small class="w-25">pm2.5</small>
+      <div class="progress w-75 mr-1" id="pm25-progress">
+      </div>
+    </div>
+    <div class="d-flex flex-row mb-1">
+      <small class="w-25">co2</small>
+      <div class="progress w-75 mr-1" id="co-progress">
+      </div>
+    </div>
+    <div class="d-flex flex-row mb-1">
+      <small class="w-25">o3</small>
+      <div class="progress w-75 mr-1" id="o3-progress">
+      </div>
+    </div>
+    <div class="d-flex flex-row mb-1">
+      <small class="w-25">no2</small>
+      <div class="progress w-75 mr-1" id="no2-progress">
+      </div>
+    </div>
+    <div id="data-time-label">
+      <p>Data Collected at : </p>
+    </div>
+    <button type="button" class="btn btn-success btn m-2" id="add-to-favorite-btn">
+      <i class="fas fa-star"></i> Add to favorite
+    </button>
+  </div>
+  <script>
+    var map;
+    var heatmap;
+    var markers = [];
+    var heatmapData = [];
+    var aqiDetail;
+    var favoriteList = localStorage.getItem("aqiFavoritesGeo");
+    favoriteList = favoriteList == null ? [] : JSON.parse(favoriteList);
+        localStorage.setItem("aqiFavoritesGeo", JSON.stringify(favoriteList));
+
+    for(var i = 0; i < favoriteList.length; i++) {
+      var item = favoriteList[i];
+      drawFavoriteItem(item);
+    }
+        
+    const TOKEN = "80860687b4b6c03df2a8c5e1b9a895275abc368d";
+    const RADIUS_XS = 70;
+    const RADIUS_S = 80;
+    const RADIUS_M = 90;
+    const RADIUS_L = 100;
+    const RADIUS_XL = 110;
+    const INITIAL_CENTER = {lat: 37.566535, lng: 126.9779692}; // Seoul
+    const ZOOM_LEVEL = 12;
+    const MAX_INTENSITY_AQI = 300;
+    // http://wiki.mossol.net/display/TOK/Planning+For+AqiTracer#PlanningForAqiTracer-AQIReference
+    const MAX_INTENSITY_PM10 = 100;
+    const MAX_INTENSITY_PM25 = 50;
+    
+    // marker svg
+    const SQUARE_PIN = "M22-48h-44v43h16l6 5 6-5h16z";
+    
+    // colors
+    const AQI_GOOD_COLOR = 'rgba(31, 168, 235, 1)';
+    const AQI_MODERATE_COLOR = 'rgba(46, 204, 113, 1)';
+    const AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR = 'rgba(247, 220, 111, 1)';
+    const AQI_UNHEARTHY_COLOR = 'rgba(235, 149, 31, 1)';
+    const AQI_VERY_UNHEARTHY_COLOR = 'rgba(235, 47, 31, 1)';
+    const AQI_HAZARDOUS_COLOR = 'rgba(146, 43, 33, 1)';
+    const GRADIENT = [
+      'rgba(0, 0, 0, 0)',
+      AQI_GOOD_COLOR,
+      AQI_MODERATE_COLOR,
+      AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR,
+      AQI_UNHEARTHY_COLOR,
+      AQI_VERY_UNHEARTHY_COLOR,
+      AQI_HAZARDOUS_COLOR,
+    ];
+    
+    // WHO standards
+    const WHO_AQI = [
+      50.0,
+      100.0,
+      150.0,
+      200.0,
+      300.0,
+      500.0
+    ];
+    // S.Korea standards
+    const S_KOREA_AQI = [
+      50.0,
+      100.0,
+      150.0,
+      250.0,
+      350.0,
+      500.0
+    ];
+    const AQI_CRITERIA_LIST = [
+      WHO_AQI,
+      S_KOREA_AQI
+    ];
+    // WHO standards
+    const WHO_PM10 = [
+      30.0,
+      50.0,
+      100.0
+    ];
+    // S.Korea standards    
+    const S_KOREA_PM10 = [
+      30.0,
+      80.0,
+      150.0
+    ];
+    const PM10_CRITERIA_LIST = [
+      WHO_PM10,
+      S_KOREA_PM10
+    ];
+    // WHO standards
+    const WHO_PM25 = [
+      15.0,
+      25.0,
+      50.0
+    ];
+    // S.Korea standards
+    const S_KOREA_PM25 = [
+      15.0,
+      35.0,
+      75.0
+    ];
+    const PM25_CRITERIA_LIST = [
+      WHO_PM25,
+      S_KOREA_PM25
+    ];
+    
+    const AQI_GOOD_IDX = 0;
+    const AQI_MODERATE_IDX = 1;
+    const AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX = 2;
+    const AQI_UNHEARTHY_IDX = 3;
+    const AQI_VERY_UNHEARTHY_IDX = 4;
+    const AQI_HAZARDOUS_IDX = 5;
+    
+    function convertToWeightedLatLngArray(aqiList) {
+      var ret = [];
+       
+      for(var i = 0; i < aqiList.data.length; i++) {
+        var item = aqiList.data[i];
+         
+        var aqi = item.aqi;
+        var lat = item.lat;
+        var lng = item.lon;
+         
+        var converted = {location: new google.maps.LatLng(lat, lng), weight: parseFloat(aqi)};
+         
+        ret.push(converted);
       }
        
-      #description {
-        font-family: Roboto;
-        font-size: 15px;
-        font-weight: 300;
+      return ret;
+    }
+    
+    function clearMarkers() {
+      if(markers != null && markers.length > 0) {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+        markers = [];
       }
- 
-      #infowindow-content .title {
-        font-weight: bold;
+    }
+    
+    function getAQIColor(aqival, aqi_criteria) {
+      if(aqival <= aqi_criteria[AQI_GOOD_IDX])
+        return AQI_GOOD_COLOR;
+      else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
+        return AQI_MODERATE_COLOR;
+      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
+        return AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR;
+      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_IDX])
+        return AQI_UNHEARTHY_COLOR;
+      else if(aqival <= aqi_criteria[AQI_VERY_UNHEARTHY_IDX])
+        return AQI_VERY_UNHEARTHY_COLOR;
+      else
+        return AQI_HAZARDOUS_COLOR;
+    }
+    
+    function getAQIString(aqival, aqi_criteria) {
+      if(aqival <= aqi_criteria[AQI_GOOD_IDX])
+        return "GOOD (좋음)";
+      else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
+        return "MODERATE (보통)";
+      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
+        return "UNHEARTHY FOR SENSITIVE GROUPS (민감군에게 영향)";
+      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_IDX])
+        return "UNHEARTHY (나쁨)";
+      else if(aqival <= aqi_criteria[AQI_VERY_UNHEARTHY_IDX])
+        return "VERY UNHEARTHY (매우 나쁨)";
+      else
+        return "HAZARDOUS (위험, 해로움)";
+    }
+    
+    function getPMColor(aqival, aqi_criteria) {
+      if(aqival <= aqi_criteria[AQI_GOOD_IDX])
+        return AQI_GOOD_COLOR;
+      else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
+        return AQI_MODERATE_COLOR;
+      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
+        return AQI_UNHEARTHY_COLOR;
+      else
+        return AQI_VERY_UNHEARTHY_COLOR;
+    }
+    
+    function getWidthPercentage(val, max) {
+      width = val / max * 100;
+      width = width >= 100 ? 100 : width;
+      return width;
+    }
+    
+    function drawDetails() {
+      var selectorIndex = $("#criteria-select").val();
+      var aqi = aqiDetail.aqi;
+      const aqiCriteria = AQI_CRITERIA_LIST[selectorIndex];
+      var color = getAQIColor(aqi, aqiCriteria);
+      var textStyle = 'style = "color: ' + color + ';"';
+          
+      $('#cityname-label').html('<p class="mb-1">' + aqiDetail.city.name + '</p>');
+      $('#status-label').html('<b ' + textStyle + '>' + getAQIString(aqi, aqiCriteria) + '</b>');
+      var dataCollectedAt = '<small class="muted"> Data Collected at : ' + aqiDetail.time.s +' </small>' + 
+      '<button type="button" class="btn btn-link btn-sm" data-toggle="modal" ' + 
+        'data-target="#crawled-by-modal">' + 
+        '<i class="fas fa-info-circle"></i>' + 
+      '</button>';
+      	var crawled_by = '';
+      for(var i = 0; i < aqiDetail.attributions.length; i++) {
+        var item = aqiDetail.attributions[i];
+        crawled_by += '<li><small class="muted">' + item.name + ' - ';
+        crawled_by += '<a href="' + item.url + '">' + item.url + '</a></small></li>';
       }
- 
-      #infowindow-content {
-        display: none;
-      }
- 
-      #map #infowindow-content {
-        display: inline;
-      }
- 
-      .pac-card {
-        margin: 10px 10px 0 0;
-        border-radius: 2px 0 0 2px;
-        box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        outline: none;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        background-color: #fff;
-        font-family: Roboto;
-      }
- 
-      #pac-container {
-        padding-bottom: 12px;
-        margin-right: 12px;
-      }
- 
-      .pac-controls {
-        display: inline-block;
-        padding: 5px 11px;
-      }
- 
-      .pac-controls label {
-        font-family: Roboto;
-        font-size: 13px;
-        font-weight: 300;
-      }
- 
-      #pac-input {
-        background-color: #fff;
-        font-family: Roboto;
-        font-size: 15px;
-        font-weight: 300;
-        text-overflow: ellipsis;
-      }
- 
-      #pac-input:focus {
-        border-color: #4d90fe;
-      }
- 
-      #title {
-        color: #fff;
-        background-color: #4d90fe;
-        font-size: 25px;
-        font-weight: 500;
-        padding: 6px 12px;
-      }
-      #target {
-        width: 345px;
-      }
-      #cityname-label {
-        font-size: 14px;  
-      }
-	  
-      .foot {
-        border-top: 1px solid #999999;
-        position:fixed !important;
-        height: 320px;
-        z-index: 10000;
-        text-align:center;
-        font-size:14px;
-        color: #000;
-        background: #FFF;
-        justify-content: center; /* align horizontal */
-        border-top-left-radius:10px !important;
-        border-top-right-radius:10px !important;
-        right: 0;
-        left: 0;
-        margin-right: auto;
-        margin-left: auto;
-        bottom: -220px;
-      }
-	  
-      .foot-header {
-        height: 100px;
-      }
-  
-      .tab-field {
-        border-top-left-radius:10px !important;
-        border-top-right-radius:10px !important;
-      }
-	  
-      .slide-up {
-        bottom: 0%;
-      }
-	  
-      .slide-down {
-        bottom: -220px !important;
-      }
-	  
-      div.scrollmenu {
-        background-color: #E8E5E5;
-        overflow: auto;
-        white-space: nowrap;
-      }
+      	
+      $('#data-time-label').html(dataCollectedAt);
+      	$('#crawled-by-content').html(crawled_by);
+      
+      var width = getWidthPercentage(aqi, MAX_INTENSITY_AQI);
+      $('#aqi-progress').html(makeProgressBar(width, color, aqi));
+          
+      var iaqi = aqiDetail.iaqi;
+      var pm10 = iaqi.pm10.v;
+      width = getWidthPercentage(pm10, MAX_INTENSITY_AQI);
+      color = getAQIColor(pm10, aqiCriteria);
+      $('#pm10-progress').html(makeProgressBar(width, color, pm10));
+      
+      var pm25 = iaqi.pm25.v;
+      width = getWidthPercentage(pm25, MAX_INTENSITY_AQI);
+      color = getAQIColor(pm25, aqiCriteria);
+      $('#pm25-progress').html(makeProgressBar(width, color, pm25));
+      var co = iaqi.co.v;
+      width = getWidthPercentage(co, MAX_INTENSITY_AQI);
+      color = getAQIColor(co, aqiCriteria);
+      $('#co-progress').html(makeProgressBar(width, color, co));
+      
+      var o3 = iaqi.o3.v;
+      width = getWidthPercentage(o3, MAX_INTENSITY_AQI);
+      color = getAQIColor(o3, aqiCriteria);
+      $('#o3-progress').html(makeProgressBar(width, color, o3));
+      
+      var no2 = iaqi.no2.v;
+      width = getWidthPercentage(no2, MAX_INTENSITY_AQI);
+      color = getAQIColor(no2, aqiCriteria);
+      $('#no2-progress').html(makeProgressBar(width, color, no2));
+    }
+    
+    function drawMarkers() {
+      // If marker is not empty, remove and initializae it.
+      clearMarkers();
+      
+      heatmapData.forEach(function(item) {
+        var aqival = item.weight;
+        var aqi_criteria = AQI_CRITERIA_LIST[$("#criteria-select").val()];
+        
+        var color = getAQIColor(aqival, aqi_criteria);
+         
+        if(aqival != null && !isNaN(aqival)) {
+          var marker = new google.maps.Marker({
+            map: map,
+            position: item.location,
+            icon: {
+              path: SQUARE_PIN,
+              fillColor: color,
+              fillOpacity: 0.7,
+              strokeColor: '',
+              strokeWeight: 0,
+              labelOrigin: new google.maps.Point(0, -25)
+            },
+            label: "" + aqival
+          });
+          marker.addListener('click', function() {
+            map.setCenter(marker.getPosition());
+          })
+          markers.push(marker);
+        }
+      });
+    }
+    
+    function drawFavoriteItem(cityItem) {
+      var name = cityItem.name.split(",")[0];
+      var id = "pos-" + name + "-btn"
+      var posBtn = 
+        $('<button class="btn btn-outline-primary btn-sm" type="button" id="' + id + '">' +
+            name + 
+          '</button>');
+      	var deleteBtn = 
+        $('<button type="button" class="btn btn-secondary btn-sm" id="' + id + '-close">' + 
+            '<span aria-hidden="true">&times;</span>' + 
+          '</button>');
+      var btnGroup = 
+        $('<div class="btn-group" role="group" aria-label="btn-group"></div>');
+      btnGroup.append(posBtn);
+      btnGroup.append(deleteBtn);
 
-      div.scrollmenu li {
-        display: inline-block;
-        color: white;
-        text-align: center;
-        padding: 1%;
-        text-decoration: none;
-      }
-    </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-  </head>
-  <body>
-    <!-- Modal -->
-    <div class="modal fade" id="crawled-by-modal" tabindex="-1" role="dialog" aria-labelledby="crawledByModal" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="crawled-by-label">Data Collected By</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body" id="crawled-by-content">
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="input-group mb-0">
-      <div class="input-group-prepend">
-        <button class="btn btn-secondary btn-sm" type="button" id="curpos-btn">
-          <i class="fas fa-crosshairs"></i>
-        </button>
-      </div>
-      <input type="text" class="form-control" onfocus="this.value=''" placeholder="Search Place..." aria-label="Place" aria-describedby="basic-addon1" id="pac-input">
-      <div class="input-group-append">
-        <select class="custom-select" id="criteria-select" aria-label="criteris-select">
-          <option value="0" selected>WHO</option>
-          <option value="1">South Korea</option>
-        </select>
-      </div>
-    </div>
-    <div class="scrollmenu">
-    </div>
-    <div id="map"></div>
-    <div class="card foot w-75">
-      <div class="w-100 foot-header" id="foot-header">
-        <div class="mb-1 w-100 alert-dark tab-field"><b>Tap here to check details</b></div>
-        <div id="cityname-label">
-          <p class="mb-1">City Name</p>
-        </div>
-        <div class="mb-1" id="status-label">
-          <b>Status</b>
-        </div>
-      </div>
-      <hr class="mb-1 mt-1"/>
-      <div class="d-flex flex-row mb-1">
-        <small class="w-25">aqi</small>
-        <div class="progress w-75 mr-1" id="aqi-progress">
-        </div>
-      </div>
-      <div class="d-flex flex-row mb-1">
-        <small class="w-25">pm10</small>
-        <div class="progress w-75 mr-1" id="pm10-progress">
-        </div>
-      </div>
-      <div class="d-flex flex-row mb-1">
-        <small class="w-25">pm2.5</small>
-        <div class="progress w-75 mr-1" id="pm25-progress">
-        </div>
-      </div>
-      <div class="d-flex flex-row mb-1">
-        <small class="w-25">co2</small>
-        <div class="progress w-75 mr-1" id="co-progress">
-        </div>
-      </div>
-      <div class="d-flex flex-row mb-1">
-        <small class="w-25">o3</small>
-        <div class="progress w-75 mr-1" id="o3-progress">
-        </div>
-      </div>
-      <div class="d-flex flex-row mb-1">
-        <small class="w-25">no2</small>
-        <div class="progress w-75 mr-1" id="no2-progress">
-        </div>
-      </div>
-      <div id="data-time-label">
-        <p>Data Collected at : </p>
-      </div>
-      <button type="button" class="btn btn-success btn m-2" id="add-to-favorite-btn">
-        <i class="fas fa-star"></i> Add to favorite
-      </button>
-    </div>
-    <script>
-      var map;
-      var heatmap;
-      var markers = [];
-      var heatmapData = [];
-      var aqiDetail;
-      var favoriteList = localStorage.getItem("aqiFavoritesGeo");
-      favoriteList = favoriteList == null ? [] : JSON.parse(favoriteList);
-	  localStorage.setItem("aqiFavoritesGeo", JSON.stringify(favoriteList));
+      var item = $('<li></li>');
+      item.append(btnGroup);
 
+      posBtn.on('click', function() {
+        var cityGeo = cityItem.geo;
+        var center = {lat: cityGeo[0], lng: cityGeo[1]};
+        map.setCenter(center);
+      });
+
+      deleteBtn.on('click', function() {
+        item.remove();
+        for(var i = 0; i < favoriteList.length; i++) {
+          var favorite = favoriteList[i];
+          if(favorite.name == cityItem.name) {
+            favoriteList.splice(i, 1);
+            localStorage.setItem("aqiFavoritesGeo", JSON.stringify(favoriteList));
+            break;
+          }
+        }
+      });
+
+      $('.scrollmenu').append(item);
+    }
+    
+    $("#criteria-select").change(function() {
+      drawMarkers();
+      drawDetails();
+    });
+
+    $('#foot-header').click(function() {
+      if($('.foot').hasClass('slide-up')) {
+        $('.foot').addClass('slide-down', 1000, 'easeOutExpo');
+        $('.foot').removeClass('slide-up'); 
+      } else {
+        $('.foot').removeClass('slide-down');
+        $('.foot').addClass('slide-up', 1000, 'easeOutExpo'); 
+      }
+    });
+
+    $('#curpos-btn').click(function() {
+      moveToCurrentPos();
+    });
+
+    $('#add-to-favorite-btn').click(function() {
+      var city = aqiDetail.city;
+      var alreadyIn = false;
       for(var i = 0; i < favoriteList.length; i++) {
         var item = favoriteList[i];
-        drawFavoriteItem(item);
+        if(item.name == city.name) alreadyIn = true;
       }
-	  
-      const TOKEN = "80860687b4b6c03df2a8c5e1b9a895275abc368d";
-      const RADIUS_XS = 70;
-      const RADIUS_S = 80;
-      const RADIUS_M = 90;
-      const RADIUS_L = 100;
-      const RADIUS_XL = 110;
-      const INITIAL_CENTER = {lat: 37.566535, lng: 126.9779692}; // Seoul
-      const ZOOM_LEVEL = 12;
-      const MAX_INTENSITY_AQI = 300;
-      // http://wiki.mossol.net/display/TOK/Planning+For+AqiTracer#PlanningForAqiTracer-AQIReference
-      const MAX_INTENSITY_PM10 = 100;
-      const MAX_INTENSITY_PM25 = 50;
-      
-      // marker svg
-      const SQUARE_PIN = "M22-48h-44v43h16l6 5 6-5h16z";
-      
-      // colors
-      const AQI_GOOD_COLOR = 'rgba(31, 168, 235, 1)';
-      const AQI_MODERATE_COLOR = 'rgba(46, 204, 113, 1)';
-      const AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR = 'rgba(247, 220, 111, 1)';
-      const AQI_UNHEARTHY_COLOR = 'rgba(235, 149, 31, 1)';
-      const AQI_VERY_UNHEARTHY_COLOR = 'rgba(235, 47, 31, 1)';
-      const AQI_HAZARDOUS_COLOR = 'rgba(146, 43, 33, 1)';
-      const GRADIENT = [
-        'rgba(0, 0, 0, 0)',
-        AQI_GOOD_COLOR,
-        AQI_MODERATE_COLOR,
-        AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR,
-        AQI_UNHEARTHY_COLOR,
-        AQI_VERY_UNHEARTHY_COLOR,
-        AQI_HAZARDOUS_COLOR,
-      ];
-      
-      // WHO standards
-      const WHO_AQI = [
-        50.0,
-        100.0,
-        150.0,
-        200.0,
-        300.0,
-        500.0
-      ];
-      // S.Korea standards
-      const S_KOREA_AQI = [
-        50.0,
-        100.0,
-        150.0,
-        250.0,
-        350.0,
-        500.0
-      ];
-      const AQI_CRITERIA_LIST = [
-        WHO_AQI,
-        S_KOREA_AQI
-      ];
-      // WHO standards
-      const WHO_PM10 = [
-        30.0,
-        50.0,
-        100.0
-      ];
-      // S.Korea standards    
-      const S_KOREA_PM10 = [
-        30.0,
-        80.0,
-        150.0
-      ];
-      const PM10_CRITERIA_LIST = [
-        WHO_PM10,
-        S_KOREA_PM10
-      ];
-      // WHO standards
-      const WHO_PM25 = [
-        15.0,
-        25.0,
-        50.0
-      ];
-      // S.Korea standards
-      const S_KOREA_PM25 = [
-        15.0,
-        35.0,
-        75.0
-      ];
-      const PM25_CRITERIA_LIST = [
-        WHO_PM25,
-        S_KOREA_PM25
-      ];
-      
-      const AQI_GOOD_IDX = 0;
-      const AQI_MODERATE_IDX = 1;
-      const AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX = 2;
-      const AQI_UNHEARTHY_IDX = 3;
-      const AQI_VERY_UNHEARTHY_IDX = 4;
-      const AQI_HAZARDOUS_IDX = 5;
-      
-      function convertToWeightedLatLngArray(aqiList) {
-        var ret = [];
-         
-        for(var i = 0; i < aqiList.data.length; i++) {
-          var item = aqiList.data[i];
-           
-          var aqi = item.aqi;
-          var lat = item.lat;
-          var lng = item.lon;
-           
-          var converted = {location: new google.maps.LatLng(lat, lng), weight: parseFloat(aqi)};
-           
-          ret.push(converted);
-        }
-         
-        console.log(ret);
-         
-        return ret;
+      if(!alreadyIn) {
+        favoriteList.push(city);
+        localStorage.setItem("aqiFavoritesGeo", JSON.stringify(favoriteList));
+        drawFavoriteItem(city);
       }
-      
-      function clearMarkers() {
-        if(markers != null && markers.length > 0) {
-          for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
-          }
-          markers = [];
-        }
-      }
-      
-      function getAQIColor(aqival, aqi_criteria) {
-        if(aqival <= aqi_criteria[AQI_GOOD_IDX])
-          return AQI_GOOD_COLOR;
-        else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
-          return AQI_MODERATE_COLOR;
-        else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
-          return AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR;
-        else if(aqival <= aqi_criteria[AQI_UNHEARTHY_IDX])
-          return AQI_UNHEARTHY_COLOR;
-        else if(aqival <= aqi_criteria[AQI_VERY_UNHEARTHY_IDX])
-          return AQI_VERY_UNHEARTHY_COLOR;
-        else
-          return AQI_HAZARDOUS_COLOR;
-      }
-      
-      function getAQIString(aqival, aqi_criteria) {
-        if(aqival <= aqi_criteria[AQI_GOOD_IDX])
-          return "GOOD (좋음)";
-        else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
-          return "MODERATE (보통)";
-        else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
-          return "UNHEARTHY FOR SENSITIVE GROUPS (민감군에게 영향)";
-        else if(aqival <= aqi_criteria[AQI_UNHEARTHY_IDX])
-          return "UNHEARTHY (나쁨)";
-        else if(aqival <= aqi_criteria[AQI_VERY_UNHEARTHY_IDX])
-          return "VERY UNHEARTHY (매우 나쁨)";
-        else
-          return "HAZARDOUS (위험, 해로움)";
-      }
-      
-      function getPMColor(aqival, aqi_criteria) {
-        if(aqival <= aqi_criteria[AQI_GOOD_IDX])
-          return AQI_GOOD_COLOR;
-        else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
-          return AQI_MODERATE_COLOR;
-        else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
-          return AQI_UNHEARTHY_COLOR;
-        else
-          return AQI_VERY_UNHEARTHY_COLOR;
-      }
-      
-      function getWidthPercentage(val, max) {
-        width = val / max * 100;
-        width = width >= 100 ? 100 : width;
-        return width;
-      }
-      
-      function drawDetails() {
-        var selectorIndex = $("#criteria-select").val();
-        var aqi = aqiDetail.aqi;
-        const aqiCriteria = AQI_CRITERIA_LIST[selectorIndex];
-        var color = getAQIColor(aqi, aqiCriteria);
-        var textStyle = 'style = "color: ' + color + ';"';
-            
-        $('#cityname-label').html('<p class="mb-1">' + aqiDetail.city.name + '</p>');
-        $('#status-label').html('<b ' + textStyle + '>' + getAQIString(aqi, aqiCriteria) + '</b>');
-        var dataCollectedAt = '<small class="muted"> Data Collected at : ' + aqiDetail.time.s +' </small>' + 
-        '<button type="button" class="btn btn-link btn-sm" data-toggle="modal" ' + 
-          'data-target="#crawled-by-modal">' + 
-          '<i class="fas fa-info-circle"></i>' + 
-        '</button>';
-		var crawled_by = '';
-        for(var i = 0; i < aqiDetail.attributions.length; i++) {
-          var item = aqiDetail.attributions[i];
-          crawled_by += '<li><small class="muted">' + item.name + ' - ';
-          crawled_by += '<a href="' + item.url + '">' + item.url + '</a></small></li>';
-        }
-		
-        $('#data-time-label').html(dataCollectedAt);
-		$('#crawled-by-content').html(crawled_by);
+    });
         
-        var width = getWidthPercentage(aqi, MAX_INTENSITY_AQI);
-        $('#aqi-progress').html(makeProgressBar(width, color, aqi));
-            
-        var iaqi = aqiDetail.iaqi;
-        var pm10 = iaqi.pm10.v;
-        width = getWidthPercentage(pm10, MAX_INTENSITY_AQI);
-        color = getAQIColor(pm10, aqiCriteria);
-        $('#pm10-progress').html(makeProgressBar(width, color, pm10));
-        
-        var pm25 = iaqi.pm25.v;
-        width = getWidthPercentage(pm25, MAX_INTENSITY_AQI);
-        color = getAQIColor(pm25, aqiCriteria);
-        $('#pm25-progress').html(makeProgressBar(width, color, pm25));
-        var co = iaqi.co.v;
-        width = getWidthPercentage(co, MAX_INTENSITY_AQI);
-        color = getAQIColor(co, aqiCriteria);
-        $('#co-progress').html(makeProgressBar(width, color, co));
-        
-        var o3 = iaqi.o3.v;
-        width = getWidthPercentage(o3, MAX_INTENSITY_AQI);
-        color = getAQIColor(o3, aqiCriteria);
-        $('#o3-progress').html(makeProgressBar(width, color, o3));
-        
-        var no2 = iaqi.no2.v;
-        width = getWidthPercentage(no2, MAX_INTENSITY_AQI);
-        color = getAQIColor(no2, aqiCriteria);
-        $('#no2-progress').html(makeProgressBar(width, color, no2));
-      }
-      
-      function drawMarkers() {
-        // If marker is not empty, remove and initializae it.
-        clearMarkers();
-        
-        heatmapData.forEach(function(item) {
-          var aqival = item.weight;
-          var aqi_criteria = AQI_CRITERIA_LIST[$("#criteria-select").val()];
-          
-          var color = getAQIColor(aqival, aqi_criteria);
-           
-          if(aqival != null && !isNaN(aqival)) {
-            var marker = new google.maps.Marker({
-              map: map,
-              position: item.location,
-              icon: {
-                path: SQUARE_PIN,
-                fillColor: color,
-                fillOpacity: 0.7,
-                strokeColor: '',
-                strokeWeight: 0,
-                labelOrigin: new google.maps.Point(0, -25)
-              },
-              label: {
-                text: "" + aqival,
-//              color: color
-              }
-            });
-			
-			marker.addListener('click', function() {
-			  map.setCenter(marker.getPosition());
-			})
-            markers.push(marker);
-          }
+    function makeProgressBar(width, color, val) {
+      var style = 'style= "width: ' + width + '%; background-color: ' + color + ' !important;"';
+      var progressBarBegin = '<div class="progress-bar" role="progressbar" ';
+      var progressBarEnd = '>' + val + '</div>';
+      return progressBarBegin + style + progressBarEnd;
+    }   
+    
+    function moveToCurrentPos() {
+      // Try HTML5 geolocation.
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          map.setCenter(pos);
+        }, function() {
+          // fail
         });
+      } else {
+        // Browser doesn't support Geolocation
       }
-      
-      function drawFavoriteItem(cityItem) {
-        var name = cityItem.name.split(",")[0];
-        var id = "pos-" + name + "-btn"
-        var posBtn = 
-          $('<button class="btn btn-outline-primary btn-sm" type="button" id="' + id + '">' +
-              name + 
-            '</button>');
-		var deleteBtn = 
-          $('<button type="button" class="btn btn-secondary btn-sm" id="' + id + '-close">' + 
-              '<span aria-hidden="true">&times;</span>' + 
-            '</button>');
-        var btnGroup = 
-          $('<div class="btn-group" role="group" aria-label="btn-group"></div>');
-        btnGroup.append(posBtn);
-        btnGroup.append(deleteBtn);
-
-        var item = $('<li></li>');
-        item.append(btnGroup);
-
-        posBtn.on('click', function() {
-          var cityGeo = cityItem.geo;
-          var center = {lat: cityGeo[0], lng: cityGeo[1]};
-          map.setCenter(center);
-        });
-
-        deleteBtn.on('click', function() {
-          item.remove();
-          for(var i = 0; i < favoriteList.length; i++) {
-            var favorite = favoriteList[i];
-            if(favorite.name == cityItem.name) {
-              favoriteList.splice(i, 1);
-              localStorage.setItem("aqiFavoritesGeo", JSON.stringify(favoriteList));
-              break;
-            }
-          }
-        });
-
-        $('.scrollmenu').append(item);
-      }
-      
-      $("#criteria-select").change(function() {
-        drawMarkers();
-        drawDetails();
-      });
-
-      $('#foot-header').click(function() {
-        if($('.foot').hasClass('slide-up')) {
-          $('.foot').addClass('slide-down', 1000, 'easeOutExpo');
-          $('.foot').removeClass('slide-up'); 
-        } else {
-          $('.foot').removeClass('slide-down');
-          $('.foot').addClass('slide-up', 1000, 'easeOutExpo'); 
-        }
-      });
-
-      $('#curpos-btn').click(function() {
-        moveToCurrentPos();
-      });
-
-      $('#add-to-favorite-btn').click(function() {
-        var city = aqiDetail.city;
-        var alreadyIn = false;
-        for(var i = 0; i < favoriteList.length; i++) {
-          var item = favoriteList[i];
-          if(item.name == city.name) alreadyIn = true;
-        }
-        if(!alreadyIn) {
-          favoriteList.push(city);
-          localStorage.setItem("aqiFavoritesGeo", JSON.stringify(favoriteList));
-          drawFavoriteItem(city);
-        }
-      });
-	  
-      function makeProgressBar(width, color, val) {
-        var style = 'style= "width: ' + width + '%; background-color: ' + color + ' !important;"';
-        var progressBarBegin = '<div class="progress-bar" role="progressbar" ';
-        var progressBarEnd = '>' + val + '</div>';
-        return progressBarBegin + style + progressBarEnd;
-      }   
-      
-      function moveToCurrentPos() {
-        // Try HTML5 geolocation.
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(position) {
-            var pos = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            map.setCenter(pos);
-          }, function() {
-            // fail
-          });
-        } else {
-          // Browser doesn't support Geolocation
-        }
-      }	  
-	   
-      function initAutocomplete() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: INITIAL_CENTER,
-          zoom: ZOOM_LEVEL,
-          mapTypeId: 'roadmap',
-          maxZoom: ZOOM_LEVEL + 1,
-          minZoom: ZOOM_LEVEL - 1
-        });
+    }	  
          
-        // Create the search box and link it to the UI element.
-        var input = document.getElementById('pac-input');
-        var searchBox = new google.maps.places.SearchBox(input);
-         
-        searchBox.addListener('places_changed', function() {
-          var places = searchBox.getPlaces();
- 
-          if (places.length == 0) {
+    function initAutocomplete() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: INITIAL_CENTER,
+        zoom: ZOOM_LEVEL,
+        mapTypeId: 'roadmap',
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+          style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+        },
+        maxZoom: ZOOM_LEVEL + 1.5,
+        minZoom: ZOOM_LEVEL - 1.5
+      });
+       
+      // Create the search box and link it to the UI element.
+      var input = document.getElementById('pac-input');
+      var searchBox = new google.maps.places.SearchBox(input);
+       
+      searchBox.addListener('places_changed', function() {
+        var places = searchBox.getPlaces();
+
+        if (places.length == 0) {
+          return;
+        }
+        // For each place, get the icon, name and location.
+        var bounds = new google.maps.LatLngBounds();
+        places.forEach(function(place) {
+          if (!place.geometry) {
+            console.log("Returned place contains no geometry");
             return;
           }
-          // For each place, get the icon, name and location.
-          var bounds = new google.maps.LatLngBounds();
-          places.forEach(function(place) {
-            if (!place.geometry) {
-              console.log("Returned place contains no geometry");
-              return;
-            }
- 
-            if (place.geometry.viewport) {
-              // Only geocodes have viewport.
-              bounds.union(place.geometry.viewport);
-            } else {
-              bounds.extend(place.geometry.location);
-            }
-          });
-          map.fitBounds(bounds);
-        });
 
-        moveToCurrentPos();
-        
-        google.maps.event.addListener(map, 'idle', function() {
-          var bounds =  map.getBounds();
-          var ne = bounds.getNorthEast();
-          var sw = bounds.getSouthWest();
-          var center = bounds.getCenter();
-          // Bounds changed. Read changed bounds of the map.
-          var latlngBoundsQuery = sw.lat() + "," + sw.lng() + "," + ne.lat() + "," + ne.lng();
-          
-          // Read details of the center area. This endpoint will return the nearest station and details from a given lat/lon.
-          $.getJSON("https://api.waqi.info/feed/geo:" + center.lat() + ";" + center.lng() + "/?token=" + TOKEN, function(result) {
-            console.log(result);
-            aqiDetail = result.data;
-            drawDetails();
-          });
-          
-          // Read aqi info from api. This endpoint will return all stations(and some sort of data) within a given boundary.
-          $.getJSON("https://api.waqi.info/map/bounds/?token=" + TOKEN + "&latlng=" + latlngBoundsQuery, function(result){
-            heatmapData = convertToWeightedLatLngArray(result);
-            // If the heatmap already exists, remove and initialize it.
-            if(heatmap != null) {
-              heatmap.setMap(null);
-              heatmap = null;
-            }
-             
-            heatmap = new google.maps.visualization.HeatmapLayer({
-              data: heatmapData
-            });
-            heatmap.setMap(map);
-            heatmap.set('maxIntensity', MAX_INTENSITY_AQI);
-            heatmap.set('gradient', GRADIENT);
-             
-            if(heatmapData.length < 20)
-              heatmap.set('radius', RADIUS_XL);
-            else if(heatmapData.length < 40)
-              heatmap.set('radius', RADIUS_L);
-            else if(heatmapData.length < 60)
-              heatmap.set('radius', RADIUS_M);
-            else if(heatmapData.length < 80)
-              heatmap.set('radius', RADIUS_S);
-            else
-              heatmap.set('radius', RADIUS_XS);
-            
-            drawMarkers();
-          });
+          if (place.geometry.viewport) {
+            // Only geocodes have viewport.
+            bounds.union(place.geometry.viewport);
+          } else {
+            bounds.extend(place.geometry.location);
+          }
         });
-      }
- 
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPwMPPhPdRsA8B-KdsuPspbM_vcOh4Tg0&libraries=places,visualization&callback=initAutocomplete"
-         async defer></script>
-  </body>
+        map.fitBounds(bounds);
+      });
+
+      moveToCurrentPos();
+      
+      google.maps.event.addListener(map, 'idle', function() {
+        var bounds =  map.getBounds();
+        var ne = bounds.getNorthEast();
+        var sw = bounds.getSouthWest();
+        var center = bounds.getCenter();
+        // Bounds changed. Read changed bounds of the map.
+        var latlngBoundsQuery = sw.lat() + "," + sw.lng() + "," + ne.lat() + "," + ne.lng();
+        
+        var nearestEndPoint = "https://api.waqi.info/feed/geo:" + 
+          center.lat() + ";" + center.lng() + "/?token=" + TOKEN;
+        // Read details of the center area. 
+        // This endpoint will return the nearest station and details from a given lat/lon.
+        $.getJSON(nearestEndPoint, function(result) {
+          aqiDetail = result.data;
+          drawDetails();
+        });
+        
+        var boundsEndPoint = "https://api.waqi.info/map/bounds/?token=" + TOKEN + 
+          "&latlng=" + latlngBoundsQuery;
+
+        // Read aqi info from api. 
+        // This endpoint will return all stations(and some sort of data) within a given boundary.
+
+        $.getJSON(boundsEndPoint, function(result){
+          heatmapData = convertToWeightedLatLngArray(result);
+          // If the heatmap already exists, remove and initialize it.
+          if(heatmap != null) {
+            heatmap.setMap(null);
+            heatmap = null;
+          }
+          heatmap = new google.maps.visualization.HeatmapLayer({
+            data: heatmapData
+          });
+          heatmap.setMap(map);
+          heatmap.set('maxIntensity', MAX_INTENSITY_AQI);
+          heatmap.set('gradient', GRADIENT);
+           
+          if(heatmapData.length < 20)
+            heatmap.set('radius', RADIUS_XL);
+          else if(heatmapData.length < 40)
+            heatmap.set('radius', RADIUS_L);
+          else if(heatmapData.length < 60)
+            heatmap.set('radius', RADIUS_M);
+          else if(heatmapData.length < 80)
+            heatmap.set('radius', RADIUS_S);
+          else
+            heatmap.set('radius', RADIUS_XS);
+          
+          drawMarkers();
+        });
+      });
+    }
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPwMPPhPdRsA8B-KdsuPspbM_vcOh4Tg0&libraries=places,visualization&callback=initAutocomplete" async defer></script>
+</body>
 </html>
