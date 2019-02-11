@@ -8,13 +8,6 @@
 
   <link rel="stylesheet" href="components/loader.css">
   <title>Realtime World Air Quality Map</title>
-  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-6366543454398714",
-      enable_page_level_ads: true
-    });
-  </script>
   <style>
     /* Always set the map height explicitly to define the size of the div
      * element that contains the map. */
@@ -155,6 +148,18 @@
       -webkit-box-orient: vertical;  
       overflow: hidden;
     }
+
+    .search-box{
+      height: 40px;
+      text-indent: 32px;
+    }
+
+    .fa-search { 
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+    }
   </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
@@ -179,13 +184,12 @@
       </div>
     </div>
   </div>
-  <div class="input-group mb-0">
-    <div class="input-group-prepend">
-      <span class="input-group-text"><i class="fas fa-search"></i></span>
-    </div>
-    <input type="text" class="form-control" onfocus="this.value=''" placeholder="Search Place..." aria-label="Place" aria-describedby="basic-addon1" id="pac-input">
+  <div class="input-group mb-0 w-100">
+    <span class="fas fa-search text-muted"></span>
+    <input type="text" class="form-control search-box rounded-0" 
+      placeholder="Search Place..." aria-label="Place" aria-describedby="basic-addon1" id="pac-input">
     <div class="input-group-append">
-      <select class="custom-select" id="criteria-select" aria-label="criteris-select">
+      <select class="custom-select rounded-0" id="criteria-select" aria-label="criteris-select">
         <option value="0" selected>WHO</option>
         <option value="1">South Korea</option>
       </select>
@@ -562,6 +566,10 @@
     });
 
     $('#foot-header').click(function() {
+      toggleDetail();
+    });
+
+    function toggleDetail() {
       if($('.foot').hasClass('slide-up')) {
         $('.foot').addClass('slide-down', 1000, 'easeOutExpo');
         $('.foot').removeClass('slide-up'); 
@@ -569,7 +577,7 @@
         $('.foot').removeClass('slide-down');
         $('.foot').addClass('slide-up', 1000, 'easeOutExpo'); 
       }
-    });
+    }
 
     $('#curpos-btn').click(function() {
       moveToCurrentPos();
@@ -588,7 +596,16 @@
         drawFavoriteItem(city);
       }
     });
-        
+    
+    $('.btn').mouseup(function() { this.blur() });
+    
+    $('#pac-input').focus(function() {
+      $(this).val("");
+      if($('.foot').hasClass('slide-up')) {
+        toggleDetail();
+      }
+    }); 
+
     function makeProgressBar(width, color, val) {
       var style = 'style= "width: ' + width + '%; background-color: ' + color + ' !important;"';
       var progressBarBegin = '<div class="progress-bar" role="progressbar" ';
@@ -619,6 +636,7 @@
         zoom: ZOOM_LEVEL,
         mapTypeId: 'roadmap',
         mapTypeControl: true,
+        zoomControl: false,
         mapTypeControlOptions: {
           style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
         },
