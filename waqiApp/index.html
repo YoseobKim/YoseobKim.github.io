@@ -4,6 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+  <meta property="og:title" content="World AQI Map | 세계 대기 오염 지도" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="./aqi_og_image.png" />
+  <meta property="og:description" 
+    content="오늘 당신 근처의 공기 질을 확인해보세요. Check out the air quality around you today." />
   <script src="components/loader.js"></script>
 
   <link rel="stylesheet" href="components/loader.css">
@@ -360,7 +365,85 @@
     const AQI_UNHEARTHY_IDX = 3;
     const AQI_VERY_UNHEARTHY_IDX = 4;
     const AQI_HAZARDOUS_IDX = 5;
+
+    var admobid = {};
+    if( /(android)/i.test(navigator.userAgent) ) {
+      admobid = { // for Android
+        banner: 'ca-app-pub-6366543454398714/4879209203',
+        interstitial: '',
+        rewardvideo: '',
+      };
+    } else if(/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {
+      admobid = { // for iOS
+        banner: 'ca-app-pub-6366543454398714/5232107585',
+        interstitial: '',
+        rewardvideo: '',
+      };
+    } else {
+      admobid = { // for Windows Phone
+        banner: 'ca-app-pub-6366543454398714/5232107585',
+        interstitial: '',
+        rewardvideo: '',
+      };
+    }
+  
+    function showAdMob() {
+      AdMob.removeBanner();
+      if(AdMob) AdMob.createBanner({
+        adId: admobid.banner,
+        overlap: false,
+        offsetTopBar: true,
+        adSize: 'SMART_BANNER',
+        position: AdMob.AD_POSITION.TOP_CENTER
+      });
+    }
+ 
+    function initializeAdMob(){
+      AdMob.getAdSettings(function(info){
+        console.log('adId: ' + info.adId + '\n' + 'adTrackingEnabled: ' + info.adTrackingEnabled);
+      }, function(){
+        console.log('failed to get user ad settings');
+      });
+
+      AdMob.setOptions({
+        position: AdMob.AD_POSITION.TOP_CENTER,
+        isTesting: true, // set to true, to receiving test ad for testing purpose
+        bgColor: 'black', // color name, or '#RRGGBB'
+      });
+
+      // new events, with variable to differentiate: adNetwork, adType, adEvent
+      $(document).on('onAdFailLoad', function(e){
+        // when jquery used, it will hijack the event, so we have to get data from original event
+        if(typeof e.originalEvent !== 'undefined') e = e.originalEvent;
+        var data = e.detail || e.data || e;
+
+        alert('error: ' + data.error +
+            ', reason: ' + data.reason +
+            ', adNetwork:' + data.adNetwork +
+            ', adType:' + data.adType +
+            ', adEvent:' + data.adEvent); // adType: 'banner', 'interstitial', etc.
+      });
+    }
     
+    function onDeviceReady() {
+      if (! AdMob) { 
+        alert( 'admob plugin not ready' ); 
+        return; 
+      }
+      initializeAdMob();
+      // display a banner at startup
+      showAdMob();
+    }
+
+    $(document).ready(function(){
+      // on mobile device, we must wait the 'deviceready' event fired by cordova
+      if(/(ipad|iphone|ipod|android|windows phone)/i.test(navigator.userAgent)) {
+        document.addEventListener('deviceready', onDeviceReady, false);
+      } else {
+        onDeviceReady();
+      }
+    });
+ 
     function convertToWeightedLatLngArray(aqiList) {
       var ret = [];
        
