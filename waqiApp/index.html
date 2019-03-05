@@ -290,17 +290,17 @@
     // colors
     const AQI_GOOD_COLOR = 'rgba(31, 168, 235, 1)';
     const AQI_MODERATE_COLOR = 'rgba(46, 204, 113, 1)';
-    const AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR = 'rgba(247, 220, 111, 1)';
-    const AQI_UNHEARTHY_COLOR = 'rgba(235, 149, 31, 1)';
-    const AQI_VERY_UNHEARTHY_COLOR = 'rgba(235, 47, 31, 1)';
+    const AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_COLOR = 'rgba(247, 220, 111, 1)';
+    const AQI_UNHEALTHY_COLOR = 'rgba(235, 149, 31, 1)';
+    const AQI_VERY_UNHEALTHY_COLOR = 'rgba(235, 47, 31, 1)';
     const AQI_HAZARDOUS_COLOR = 'rgba(146, 43, 33, 1)';
     const GRADIENT = [
       'rgba(0, 0, 0, 0)',
       AQI_GOOD_COLOR,
       AQI_MODERATE_COLOR,
-      AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR,
-      AQI_UNHEARTHY_COLOR,
-      AQI_VERY_UNHEARTHY_COLOR,
+      AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_COLOR,
+      AQI_UNHEALTHY_COLOR,
+      AQI_VERY_UNHEALTHY_COLOR,
       AQI_HAZARDOUS_COLOR,
     ];
     
@@ -361,9 +361,9 @@
     
     const AQI_GOOD_IDX = 0;
     const AQI_MODERATE_IDX = 1;
-    const AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX = 2;
-    const AQI_UNHEARTHY_IDX = 3;
-    const AQI_VERY_UNHEARTHY_IDX = 4;
+    const AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_IDX = 2;
+    const AQI_UNHEALTHY_IDX = 3;
+    const AQI_VERY_UNHEALTHY_IDX = 4;
     const AQI_HAZARDOUS_IDX = 5;
 
     var admobid = {};
@@ -407,7 +407,7 @@
 
       AdMob.setOptions({
         position: AdMob.AD_POSITION.TOP_CENTER,
-        isTesting: true, // set to true, to receiving test ad for testing purpose
+        isTesting: false, // set to true, to receiving test ad for testing purpose
         bgColor: 'black', // color name, or '#RRGGBB'
       });
 
@@ -476,12 +476,12 @@
         return AQI_GOOD_COLOR;
       else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
         return AQI_MODERATE_COLOR;
-      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
-        return AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR;
-      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_IDX])
-        return AQI_UNHEARTHY_COLOR;
-      else if(aqival <= aqi_criteria[AQI_VERY_UNHEARTHY_IDX])
-        return AQI_VERY_UNHEARTHY_COLOR;
+      else if(aqival <= aqi_criteria[AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_IDX])
+        return AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_COLOR;
+      else if(aqival <= aqi_criteria[AQI_UNHEALTHY_IDX])
+        return AQI_UNHEALTHY_COLOR;
+      else if(aqival <= aqi_criteria[AQI_VERY_UNHEALTHY_IDX])
+        return AQI_VERY_UNHEALTHY_COLOR;
       else
         return AQI_HAZARDOUS_COLOR;
     }
@@ -491,12 +491,12 @@
         return "GOOD (좋음)";
       else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
         return "MODERATE (보통)";
-      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
-        return "UNHEARTHY FOR SENSITIVE GROUPS (민감군에게 영향)";
-      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_IDX])
-        return "UNHEARTHY (나쁨)";
-      else if(aqival <= aqi_criteria[AQI_VERY_UNHEARTHY_IDX])
-        return "VERY UNHEARTHY (매우 나쁨)";
+      else if(aqival <= aqi_criteria[AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_IDX])
+        return "UNHEALTHY FOR SENSITIVE GROUPS (민감군에게 영향)";
+      else if(aqival <= aqi_criteria[AQI_UNHEALTHY_IDX])
+        return "UNHEALTHY (나쁨)";
+      else if(aqival <= aqi_criteria[AQI_VERY_UNHEALTHY_IDX])
+        return "VERY UNHEALTHY (매우 나쁨)";
       else
         return "HAZARDOUS (위험, 해로움)";
     }
@@ -506,10 +506,10 @@
         return AQI_GOOD_COLOR;
       else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
         return AQI_MODERATE_COLOR;
-      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
-        return AQI_UNHEARTHY_COLOR;
+      else if(aqival <= aqi_criteria[AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_IDX])
+        return AQI_UNHEALTHY_COLOR;
       else
-        return AQI_VERY_UNHEARTHY_COLOR;
+        return AQI_VERY_UNHEALTHY_COLOR;
     }
     
     function getWidthPercentage(val, max) {
@@ -536,7 +536,7 @@
       for(var i = 0; i < aqiDetail.attributions.length; i++) {
         var item = aqiDetail.attributions[i];
         crawled_by += '<li><small class="muted">' + item.name + ' - ';
-        crawled_by += '<a href="' + item.url + '">' + item.url + '</a></small></li>';
+        crawled_by += item.url + '</small></li>';
       }
       	
       $('#data-time-label').html(dataCollectedAt);
