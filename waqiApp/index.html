@@ -4,17 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+  <meta property="og:title" content="World AQI Map | 세계 대기 오염 지도" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="./aqi_og_image.png" />
+  <meta property="og:description" 
+    content="오늘 당신 근처의 공기 질을 확인해보세요. Check out the air quality around you today." />
   <script src="components/loader.js"></script>
 
   <link rel="stylesheet" href="components/loader.css">
   <title>Realtime World Air Quality Map</title>
-  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-6366543454398714",
-      enable_page_level_ads: true
-    });
-  </script>
   <style>
     /* Always set the map height explicitly to define the size of the div
      * element that contains the map. */
@@ -155,6 +153,18 @@
       -webkit-box-orient: vertical;  
       overflow: hidden;
     }
+
+    .search-box{
+      height: 40px;
+      text-indent: 32px;
+    }
+
+    .fa-search { 
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+    }
   </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
@@ -179,13 +189,12 @@
       </div>
     </div>
   </div>
-  <div class="input-group mb-0">
-    <div class="input-group-prepend">
-      <span class="input-group-text"><i class="fas fa-search"></i></span>
-    </div>
-    <input type="text" class="form-control" onfocus="this.value=''" placeholder="Search Place..." aria-label="Place" aria-describedby="basic-addon1" id="pac-input">
+  <div class="input-group mb-0 w-100">
+    <span class="fas fa-search text-muted"></span>
+    <input type="text" class="form-control search-box rounded-0" 
+      placeholder="Search Place..." aria-label="Place" aria-describedby="basic-addon1" id="pac-input">
     <div class="input-group-append">
-      <select class="custom-select" id="criteria-select" aria-label="criteris-select">
+      <select class="custom-select rounded-0" id="criteria-select" aria-label="criteris-select">
         <option value="0" selected>WHO</option>
         <option value="1">South Korea</option>
       </select>
@@ -281,17 +290,17 @@
     // colors
     const AQI_GOOD_COLOR = 'rgba(31, 168, 235, 1)';
     const AQI_MODERATE_COLOR = 'rgba(46, 204, 113, 1)';
-    const AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR = 'rgba(247, 220, 111, 1)';
-    const AQI_UNHEARTHY_COLOR = 'rgba(235, 149, 31, 1)';
-    const AQI_VERY_UNHEARTHY_COLOR = 'rgba(235, 47, 31, 1)';
+    const AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_COLOR = 'rgba(247, 220, 111, 1)';
+    const AQI_UNHEALTHY_COLOR = 'rgba(235, 149, 31, 1)';
+    const AQI_VERY_UNHEALTHY_COLOR = 'rgba(235, 47, 31, 1)';
     const AQI_HAZARDOUS_COLOR = 'rgba(146, 43, 33, 1)';
     const GRADIENT = [
       'rgba(0, 0, 0, 0)',
       AQI_GOOD_COLOR,
       AQI_MODERATE_COLOR,
-      AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR,
-      AQI_UNHEARTHY_COLOR,
-      AQI_VERY_UNHEARTHY_COLOR,
+      AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_COLOR,
+      AQI_UNHEALTHY_COLOR,
+      AQI_VERY_UNHEALTHY_COLOR,
       AQI_HAZARDOUS_COLOR,
     ];
     
@@ -352,11 +361,89 @@
     
     const AQI_GOOD_IDX = 0;
     const AQI_MODERATE_IDX = 1;
-    const AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX = 2;
-    const AQI_UNHEARTHY_IDX = 3;
-    const AQI_VERY_UNHEARTHY_IDX = 4;
+    const AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_IDX = 2;
+    const AQI_UNHEALTHY_IDX = 3;
+    const AQI_VERY_UNHEALTHY_IDX = 4;
     const AQI_HAZARDOUS_IDX = 5;
+
+    var admobid = {};
+    if( /(android)/i.test(navigator.userAgent) ) {
+      admobid = { // for Android
+        banner: 'ca-app-pub-6366543454398714/4879209203',
+        interstitial: '',
+        rewardvideo: '',
+      };
+    } else if(/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {
+      admobid = { // for iOS
+        banner: 'ca-app-pub-6366543454398714/5232107585',
+        interstitial: '',
+        rewardvideo: '',
+      };
+    } else {
+      admobid = { // for Windows Phone
+        banner: 'ca-app-pub-6366543454398714/5232107585',
+        interstitial: '',
+        rewardvideo: '',
+      };
+    }
+  
+    function showAdMob() {
+      AdMob.removeBanner();
+      if(AdMob) AdMob.createBanner({
+        adId: admobid.banner,
+        overlap: false,
+        offsetTopBar: true,
+        adSize: 'SMART_BANNER',
+        position: AdMob.AD_POSITION.TOP_CENTER
+      });
+    }
+ 
+    function initializeAdMob(){
+      AdMob.getAdSettings(function(info){
+        console.log('adId: ' + info.adId + '\n' + 'adTrackingEnabled: ' + info.adTrackingEnabled);
+      }, function(){
+        console.log('failed to get user ad settings');
+      });
+
+      AdMob.setOptions({
+        position: AdMob.AD_POSITION.TOP_CENTER,
+        isTesting: false, // set to true, to receiving test ad for testing purpose
+        bgColor: 'black', // color name, or '#RRGGBB'
+      });
+
+      // new events, with variable to differentiate: adNetwork, adType, adEvent
+      $(document).on('onAdFailLoad', function(e){
+        // when jquery used, it will hijack the event, so we have to get data from original event
+        if(typeof e.originalEvent !== 'undefined') e = e.originalEvent;
+        var data = e.detail || e.data || e;
+
+        alert('error: ' + data.error +
+            ', reason: ' + data.reason +
+            ', adNetwork:' + data.adNetwork +
+            ', adType:' + data.adType +
+            ', adEvent:' + data.adEvent); // adType: 'banner', 'interstitial', etc.
+      });
+    }
     
+    function onDeviceReady() {
+      if (! AdMob) { 
+        alert( 'admob plugin not ready' ); 
+        return; 
+      }
+      initializeAdMob();
+      // display a banner at startup
+      showAdMob();
+    }
+
+    $(document).ready(function(){
+      // on mobile device, we must wait the 'deviceready' event fired by cordova
+      if(/(ipad|iphone|ipod|android|windows phone)/i.test(navigator.userAgent)) {
+        document.addEventListener('deviceready', onDeviceReady, false);
+      } else {
+        onDeviceReady();
+      }
+    });
+ 
     function convertToWeightedLatLngArray(aqiList) {
       var ret = [];
        
@@ -389,12 +476,12 @@
         return AQI_GOOD_COLOR;
       else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
         return AQI_MODERATE_COLOR;
-      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
-        return AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_COLOR;
-      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_IDX])
-        return AQI_UNHEARTHY_COLOR;
-      else if(aqival <= aqi_criteria[AQI_VERY_UNHEARTHY_IDX])
-        return AQI_VERY_UNHEARTHY_COLOR;
+      else if(aqival <= aqi_criteria[AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_IDX])
+        return AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_COLOR;
+      else if(aqival <= aqi_criteria[AQI_UNHEALTHY_IDX])
+        return AQI_UNHEALTHY_COLOR;
+      else if(aqival <= aqi_criteria[AQI_VERY_UNHEALTHY_IDX])
+        return AQI_VERY_UNHEALTHY_COLOR;
       else
         return AQI_HAZARDOUS_COLOR;
     }
@@ -404,12 +491,12 @@
         return "GOOD (좋음)";
       else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
         return "MODERATE (보통)";
-      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
-        return "UNHEARTHY FOR SENSITIVE GROUPS (민감군에게 영향)";
-      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_IDX])
-        return "UNHEARTHY (나쁨)";
-      else if(aqival <= aqi_criteria[AQI_VERY_UNHEARTHY_IDX])
-        return "VERY UNHEARTHY (매우 나쁨)";
+      else if(aqival <= aqi_criteria[AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_IDX])
+        return "UNHEALTHY FOR SENSITIVE GROUPS (민감군에게 영향)";
+      else if(aqival <= aqi_criteria[AQI_UNHEALTHY_IDX])
+        return "UNHEALTHY (나쁨)";
+      else if(aqival <= aqi_criteria[AQI_VERY_UNHEALTHY_IDX])
+        return "VERY UNHEALTHY (매우 나쁨)";
       else
         return "HAZARDOUS (위험, 해로움)";
     }
@@ -419,10 +506,10 @@
         return AQI_GOOD_COLOR;
       else if(aqival <= aqi_criteria[AQI_MODERATE_IDX])
         return AQI_MODERATE_COLOR;
-      else if(aqival <= aqi_criteria[AQI_UNHEARTHY_FOR_SENSITIVE_GROUPS_IDX])
-        return AQI_UNHEARTHY_COLOR;
+      else if(aqival <= aqi_criteria[AQI_UNHEALTHY_FOR_SENSITIVE_GROUPS_IDX])
+        return AQI_UNHEALTHY_COLOR;
       else
-        return AQI_VERY_UNHEARTHY_COLOR;
+        return AQI_VERY_UNHEALTHY_COLOR;
     }
     
     function getWidthPercentage(val, max) {
@@ -449,7 +536,7 @@
       for(var i = 0; i < aqiDetail.attributions.length; i++) {
         var item = aqiDetail.attributions[i];
         crawled_by += '<li><small class="muted">' + item.name + ' - ';
-        crawled_by += '<a href="' + item.url + '">' + item.url + '</a></small></li>';
+        crawled_by += item.url + '</small></li>';
       }
       	
       $('#data-time-label').html(dataCollectedAt);
@@ -562,6 +649,10 @@
     });
 
     $('#foot-header').click(function() {
+      toggleDetail();
+    });
+
+    function toggleDetail() {
       if($('.foot').hasClass('slide-up')) {
         $('.foot').addClass('slide-down', 1000, 'easeOutExpo');
         $('.foot').removeClass('slide-up'); 
@@ -569,7 +660,7 @@
         $('.foot').removeClass('slide-down');
         $('.foot').addClass('slide-up', 1000, 'easeOutExpo'); 
       }
-    });
+    }
 
     $('#curpos-btn').click(function() {
       moveToCurrentPos();
@@ -588,7 +679,16 @@
         drawFavoriteItem(city);
       }
     });
-        
+    
+    $('.btn').mouseup(function() { this.blur() });
+    
+    $('#pac-input').focus(function() {
+      $(this).val("");
+      if($('.foot').hasClass('slide-up')) {
+        toggleDetail();
+      }
+    }); 
+
     function makeProgressBar(width, color, val) {
       var style = 'style= "width: ' + width + '%; background-color: ' + color + ' !important;"';
       var progressBarBegin = '<div class="progress-bar" role="progressbar" ';
@@ -619,6 +719,7 @@
         zoom: ZOOM_LEVEL,
         mapTypeId: 'roadmap',
         mapTypeControl: true,
+        zoomControl: false,
         mapTypeControlOptions: {
           style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
         },
