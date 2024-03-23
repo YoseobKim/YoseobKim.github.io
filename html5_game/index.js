@@ -158,7 +158,7 @@ function keyEnterHandler() {
              let btn = document.getElementById("dialog-btn");
              btn.innerText = "뭔지 보러갈까?";
              btn.onclick = function() {
-               window.location.href = "/giftbox.html";
+               window.location.href = "/html5_game/giftbox.html";
              };
            } else if (interactable == 0) {
              game_dialog.displayHidden();

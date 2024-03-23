@@ -71,7 +71,7 @@ let heart_button = document.querySelector('.heart');
 heart_button.onclick = function() {
   heart_button.classList.toggle('active');
   setTimeout(function() {
-    window.location.href = "/albums.html";
+    window.location.href = "/html5_game/albums.html";
   }, 1000); 
 };
 
