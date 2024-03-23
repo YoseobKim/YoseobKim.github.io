@@ -27,7 +27,7 @@ body,
 }
 
 #dialog {
-  min-width: 30%;
+  min-width: 20%;
   min-height: 19%;
   position: absolute;
 }
@@ -35,7 +35,7 @@ body,
 .dialog-box {
   font-family: Arial, sans-serif;
   color: white;
-  width: 500px;
+  width: 100%;
   background-color: rgba(27, 38, 49, 0.9);
   border: 2px solid #444;
   border-radius: 10px;
