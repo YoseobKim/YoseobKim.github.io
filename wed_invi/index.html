@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- saved from url=(0029)https://byron-1.wedsites.com/ -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta content="width=device-width, initial-scale=1" name="viewport">
 <title>김 요섭 &amp; 주 수현 결혼합니다</title>
@@ -13,201 +12,178 @@
 -->
 
 <!-- CSS -->
-<link rel="stylesheet" media="all" href="assets/main.css" data-turbolinks-track="reload">
-<link href="assets/site.css" media="all" rel="stylesheet">
-<link href="assets/alegreya.css" media="all" rel="stylesheet">
-<link href="assets/index.css" media="all" rel="stylesheet">
-
 <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 
-<script src="assets/site-0d075c36c523a32d8dbe9c146ac2f447072530918caf14f9a2365f58f3aa56cc.js" data-turbolinks-track="reload"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+
+<link href="style.css" media="all" rel="stylesheet">
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var lazyloadImages = document.querySelectorAll("img.lazy");    
+  var lazyloadThrottleTimeout;
+  
+  function lazyload () {
+    if(lazyloadThrottleTimeout) {
+      clearTimeout(lazyloadThrottleTimeout);
+    }    
+    
+    lazyloadThrottleTimeout = setTimeout(function() {
+        var scrollTop = window.pageYOffset;
+        lazyloadImages.forEach(function(img) {
+            if(img.offsetTop < (window.innerHeight + scrollTop)) {
+              img.src = img.dataset.src;
+              img.classList.remove('lazy');
+            }
+        });
+
+        lazyloadImages = document.querySelectorAll("img.lazy");    
+        if(lazyloadImages.length == 0) { 
+          document.removeEventListener("scroll", lazyload);
+          window.removeEventListener("resize", lazyload);
+          window.removeEventListener("orientationChange", lazyload);
+        }
+    }, 20);
+  }
+  
+  document.addEventListener("scroll", lazyload);
+  window.addEventListener("resize", lazyload);
+  window.addEventListener("orientationChange", lazyload);
+});
+</script>
+
+<!-- lokeshdhakar/lightbox2 -->
+<script src="assets/lightbox2-2.11.4/dist/js/lightbox-plus-jquery.js"></script>
+<link href="assets/lightbox2-2.11.4/dist/css/lightbox.min.css" rel="stylesheet" />
 
 </head>
 
-<body class="page-home v1">
+<body class="main-page">
+<!-- Head section -->
+<p class="gowun-batang-bold name font-color">김요섭 <span class="gowun-batang-regular font-color">&amp;</span> 주수현</p>
+<p class="pretended-regular date font-color">AUGUST 17, 2024</p>
 
-<!-- Beginning of Title -->
-<div class="js-site site" id="site">
-<header class="editor__section editor__section--header header js-editor-section js-section" id="header">
-<div class="header__content">
-<div class="editor__container">
-<h1 class="header__main">
-<span class="header__names">
-<span class="header__name">
-<span>
-<span class="header__firstname">
-김
-</span>
-<span class="header__lastname">
-요섭
-</span>
-</span>
-</span>
-<span class="header__delimiter">
-<span class="header__and and">
-&amp;
-</span>
-</span>
-<span class="header__name">
-<span>
-<span class="header__firstname">
-주
-</span>
-<span class="header__lastname">
-수현
-</span>
-</span>
-</span>
-</span>
-</h1>
-<h3 class="header__date">
-<div class="s">
-August 17, 2024
-</div>
-</h3>
-</div>
-</div>
-</header>
-<!-- End of Title -->
+<!-- Image section -->
+<img class="main-img" src="assets/images/main/000.png"/>
 
-<!-- Begining of Invitation Message -->
-<div class="content editor js-content js-editor">
-<div class="sections editor__sections js-editor-sections">
-<section class="editor__section has-all-widths js-editor-section section section--alignment-center section--column-odd section--element-quote section--padding-bottom-50 section--padding-top-50 section--width-full">
-<div class="section__content">
-<div class="editor__container">
-<div class="js-section-render">
-<div class="section__text"> <!-- keep-all 속성을 줘야 단어가 깨지지 않음-->
+<!-- Divider -->
+<hr class="divider" />
+
+<!-- Text section -->
+<div class="text-section gowun-batang-regular font-color">
 <p>저희 두 사람 사랑으로 하나 되어<br/>작은 결혼식을 올리게 되었습니다.</p>
 <p>양가 친지분들만 모시고<br/>간소하게 식을 올리게 되어<br/>많은 분들을 초대하지 못하는 점<br/>깊은 양해를 구합니다.</p>
 <p>저희의 첫걸음을 마음으로나마<br/>축복해 주시면 감사하겠습니다.</p>
 <p>앞으로 살아가며<br/>한 분 한 분 인사드리겠습니다.</p>
-<p>김영수 &centerdot; 박인순의 장남 <b>김요섭</b> <br/>주정석 &centerdot; 김기숙의 장녀 <b>주수현</b></p>
+<p>김영수 &centerdot; 박인순의 장남 <span class="gowun-batang-bold">김요섭</span> <br/>주정석 &centerdot; 김기숙의 장녀 <span class="gowun-batang-bold">주수현</span></p>
 </div>
-</div>
-</div>
-</div>
-</section>
-<!-- End of Invitation Message -->
 
-<!-- Begining of Gallary -->
+<!-- Divider -->
+<hr class="divider" />
 
-<section class="editor__section has-all-widths js-editor-section section section--alignment-center section--column-odd section--element-image section--padding-bottom-50 section--padding-top-50 section--width-thirds">
-<div class="section__content">
-<div class="editor__container">
-<div class="js-section-render">
-<a data-lightbox="gallery" href="assets/byron-couple-1.jpg">
-<img class="section__photo" src="assets/byron-couple-1.jpg">
+<!-- Images section -->
+<div>
+<div class="row gallery">
+<div class="column gallery">
+<a href="assets/images/001.png" data-lightbox="001">
+<img src="assets/images/thumbs/001.png" style="width:100%"/>
+</a>
+<a href="assets/images/002.png" data-lightbox="002">
+<img src="assets/images/thumbs/002.png" style="width:100%"/>
+</a>
+<a href="assets/images/003.png" data-lightbox="003">
+<img src="assets/images/thumbs/003.png" style="width:100%"/>
+</a>
+<a href="assets/images/004.png" data-lightbox="004">
+<img src="assets/images/thumbs/004.png" style="width:100%"/>
+</a>
+<a href="assets/images/005.png" data-lightbox="005">
+<img data-src="assets/images/thumbs/005.png" style="width:100%" class="lazy"/>
+</a>
+<a href="assets/images/006.png" data-lightbox="006">
+<img data-src="assets/images/thumbs/006.png" style="width:100%" class="lazy"/>
+</a>
+<a href="assets/images/007.png" data-lightbox="007">
+<img data-src="assets/images/thumbs/007.png" style="width:100%" class="lazy"/>
 </a>
 
+<!-- End of column -->
 </div>
-</div>
-</div>
-</section>
-
-<section class="editor__section has-all-widths js-editor-section section section--alignment-center section--column-odd section--element-image section--padding-bottom-50 section--padding-top-50 section--width-thirds">
-<div class="section__content">
-<div class="editor__container">
-<div class="js-section-render">
-<a data-lightbox="gallery" href="assets/byron-couple-2.jpg">
-<img class="section__photo" src="assets/byron-couple-2.jpg" alt="Byron couple 2">
+<div class="column gallery">
+<a href="assets/images/008.png" data-lightbox="008">
+<img src="assets/images/thumbs/008.png" style="width:100%"/>
+</a>
+<a href="assets/images/009.png" data-lightbox="009">
+<img src="assets/images/thumbs/009.png" style="width:100%"/>
+</a>
+<a href="assets/images/010.png" data-lightbox="010">
+<img src="assets/images/thumbs/010.png" style="width:100%"/>
+</a>
+<a href="assets/images/011.png" data-lightbox="011">
+<img src="assets/images/thumbs/011.png" style="width:100%"/>
+</a>
+<a href="assets/images/012.jpg" data-lightbox="012">
+<img data-src="assets/images/thumbs/012.jpg" style="width:100%" class="lazy"/>
+</a>
+<a href="assets/images/013.png" data-lightbox="013">
+<img data-src="assets/images/thumbs/013.png" style="width:100%" class="lazy"/>
+</a>
+<a href="assets/images/014.png" data-lightbox="014">
+<img data-src="assets/images/thumbs/014.png" style="width:100%" class="lazy"/>
 </a>
 
+<!-- End of column -->
 </div>
-</div>
-</div>
-</section>
-
-<section class="editor__section has-all-widths js-editor-section section section--alignment-center section--column-odd section--element-image section--padding-bottom-50 section--padding-top-50 section--width-thirds">
-<div class="section__content">
-<div class="editor__container">
-<div class="js-section-render">
-
-<a data-lightbox="gallery" href="assets/byron-couple-3.jpg">
-<img class="section__photo" src="assets/byron-couple-3.jpg" alt="Byron couple 3">
+<div class="column gallery">
+<a href="assets/images/015.png" data-lightbox="015">
+<img src="assets/images/thumbs/015.png" style="width:100%"/>
+</a>
+<a href="assets/images/016.png" data-lightbox="016">
+<img src="assets/images/thumbs/016.png" style="width:100%"/>
+</a>
+<a href="assets/images/017.png" data-lightbox="017">
+<img src="assets/images/thumbs/017.png" style="width:100%"/>
+</a>
+<a href="assets/images/018.png" data-lightbox="018">
+<img src="assets/images/thumbs/018.png" style="width:100%"/>
+</a>
+<a href="assets/images/019.png" data-lightbox="019">
+<img data-src="assets/images/thumbs/019.png" style="width:100%" class="lazy"/>
+</a>
+<a href="assets/images/020.png" data-lightbox="020">
+<img data-src="assets/images/thumbs/020.png" style="width:100%" class="lazy"/>
+</a>
+<a href="assets/images/021.png" data-lightbox="021">
+<img data-src="assets/images/thumbs/021.png" style="width:100%" class="lazy"/>
 </a>
 
+<!-- End of column -->
 </div>
-</div>
-</div>
-</section>
-
-<section class="editor__section has-all-widths js-editor-section section section--alignment-center section--column-odd section--element-image section--padding-bottom-50 section--padding-top-50 section--width-quarter">
-<div class="section__content">
-<div class="editor__container">
-<div class="js-section-render">
-<a data-lightbox="gallery" href="assets/byron-couple-4.jpg">
-<img class="section__photo" src="assets/byron-couple-4.jpg" alt="Byron couple 4">
+<div class="column gallery">
+<a href="assets/images/022.png" data-lightbox="022">
+<img src="assets/images/thumbs/022.png" style="width:100%"/>
 </a>
-</div>
-</div>
-</div>
-</section>
-
-<section class="editor__section has-all-widths js-editor-section section section--alignment-center section--column-odd section--element-image section--padding-bottom-50 section--padding-top-50 section--width-quarter">
-<div class="section__content">
-<div class="editor__container">
-<div class="js-section-render">
-
-<a data-lightbox="gallery" href="assets/byron-couple-5.jpg">
-<img class="section__photo" src="assets/byron-couple-5.jpg" alt="Byron couple 5">
+<a href="assets/images/023.png" data-lightbox="023">
+<img src="assets/images/thumbs/023.png" style="width:100%"/>
 </a>
-</div>
-</div>
-</div>
-</section>
+<a href="assets/images/024.png" data-lightbox="024">
+<img src="assets/images/thumbs/024.png" style="width:100%"/>
+</a>
+<a href="assets/images/025.png" data-lightbox="025">
+<img src="assets/images/thumbs/025.png" style="width:100%"/>
+</a>
+<a href="assets/images/026.png" data-lightbox="026">
+<img data-src="assets/images/thumbs/026.png" style="width:100%" class="lazy"/>
+</a>
 
-<section class="editor__section has-all-widths js-editor-section section section--alignment-center section--column-odd section--element-image section--padding-bottom-50 section--padding-top-50 section--width-quarter">
-<div class="section__content">
-<div class="editor__container">
-<div class="js-section-render">
-<img class="section__photo" src="assets/byron-couple-6.jpg" alt="Byron couple 6">
-
+<!-- End of column -->
 </div>
+<!-- End of row -->
 </div>
+<!-- End of gallery -->
 </div>
-</section>
-
-<section class="editor__section has-all-widths js-editor-section section section--alignment-center section--column-odd section--element-image section--padding-bottom-50 section--padding-top-50 section--width-quarter">
-<div class="section__content">
-<div class="editor__container">
-<div class="js-section-render">
-<img class="section__photo" src="assets/byron-couple-7.jpg" alt="Byron couple 7">
-
-</div>
-</div>
-</div>
-</section>
-
-<section class="editor__section has-all-widths js-editor-section section section--alignment-center section--column-odd section--element-image section--padding-bottom-50 section--padding-top-50 section--width-thirds">
-<div class="section__content">
-<div class="editor__container">
-<div class="js-section-render">
-<img class="section__photo" src="assets/byron-couple-8.jpg" alt="Byron couple 8">
-
-</div>
-</div>
-</div>
-</section>
-
-<section class="editor__section has-all-widths js-editor-section section section--alignment-center section--column-odd section--element-image section--padding-bottom-50 section--padding-top-50 section--width-thirds">
-<div class="section__content">
-<div class="editor__container">
-<div class="js-section-render">
-<img class="section__photo" src="assets/byron-couple-9.jpg" alt="Byron couple 9">
-
-</div>
-</div>
-</div>
-</section>
-
-<section class="editor__section has-all-widths js-editor-section section section--alignment-center section--column-odd section--element-image section--padding-bottom-50 section--padding-top-50 section--width-thirds">
-<div class="section__content">
-<div class="editor__container">
-<div class="js-section-render">
-<img class="section__photo" src="assets/byron-couple-10.jpg" alt="Byron couple 10">
-
-</div>
-</div>
-</div>
-</section>
+</body>
