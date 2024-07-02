@@ -55,12 +55,21 @@
   margin-right: 5%;
 }
 
+.div-divider {
+  border-top: 1px solid #44372E;
+  margin-top: 3.5em;
+  margin-bottom: 3.5em;
+  width: 2em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .divider {
   border: none;
-  height: 0.01rem;
+  height: 1px;
   background-color: #44372E;
   color: #44372E;
-  width: 7%;
+  width: 2em;
   margin-top: 3.5em;
   margin-bottom: 3.5em;
 }
