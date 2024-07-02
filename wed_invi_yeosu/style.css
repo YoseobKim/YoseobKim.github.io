@@ -33,6 +33,11 @@
   font-size: 1.3em;
 }
 
+.date-kor {
+  text-align: center;
+  font-size: 1.0em;
+}
+
 .main-img {
   width: 90%;
   margin-top: 10%;
