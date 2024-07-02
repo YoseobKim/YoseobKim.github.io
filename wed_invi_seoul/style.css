@@ -26,14 +26,18 @@
   margin-top: 27%;
   text-align: center;
   font-size: 2.3em;
+  margin-bottom: 0.3em;
 }
 
 .date {
+  margin-top: 0.3em;
   text-align: center;
   font-size: 1.3em;
 }
 
 .date-kor {
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
   text-align: center;
   font-size: 1.0em;
 }
@@ -47,10 +51,8 @@
 
 .yakdo-img {
   width: 90%;
-  margin-top: 5%;
   margin-left: 5%;
   margin-right: 5%;
-  margin-bottom: 5%;
 }
 
 .divider {
@@ -59,21 +61,20 @@
   background-color: #44372E;
   color: #44372E;
   width: 7%;
-  margin-top: 5%;
+  margin-top: 3.5em;
+  margin-bottom: 3.5em;
 }
 
 .text-section {
   text-align: center;
   width: 100%;
   word-break: keep-all;
-  margin-top: 5%;
-  font-size: 1.15em;
+  font-size: 1.0em;
 }
 
 .gallery {
   box-sizing: border-box;
   margin: 0;
-  margin-top: 5%;
 }
 
 .row {
@@ -117,13 +118,11 @@
 }
 
 .bank-account-section {
-  margin-top: 7%;
-  margin-bottom: 7%;
 }
 
 .bank-account {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 /* Style the button that is used to open and close the collapsible content */
@@ -140,7 +139,7 @@
   margin-right: 10%;
   text-align: left;
   outline: none;
-  font-size: 1.15em;
+  font-size: 1.0em;
 }
 
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
@@ -161,7 +160,7 @@
   margin-left: 10%;
   margin-right: 10%;
   outline: none;
-  font-size: 1.15em;
+  font-size: 1.0em;
 }
 
 .collapsible:after {
