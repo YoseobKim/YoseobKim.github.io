@@ -210,7 +210,7 @@ function evaluateValue(currentFx, currentKimp) {
 // 2. 괴리율 시리즈 데이터 가져오기 및 차트 업데이트
 async function updatePremiumChart() {
 //    const SERIES_URL = 'https://goldkimp.com/wp-content/uploads/json/gold_premium_series.json';
-    const SERIES_URL = 'gold_premium_app/json/gold_premium_series.json';
+    const SERIES_URL = 'json/gold_premium_series.json';
     
     try {
         const response = await fetch(SERIES_URL, { cache: 'no-store' });
