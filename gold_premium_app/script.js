@@ -286,7 +286,7 @@ function renderUI() {
     // 델타 및 프리미엄 재계산
     renderDelta('delta-krx', L.delta?.krxkrw, 'krx', scale);
     renderDelta('delta-intl', L.delta?.intl_g, 'intl', scale);
-    renderDelta('delta-fx', L.delta?.usdkrw, 'fx', scale);
+    renderDelta('delta-fx', L.delta?.usdkrw, 'fx', 1);
 
     const currentKrxPrice = L.krxkrw * scale;
     const currentIntlKrwPrice = realTimeIntlKrw * scale;
