@@ -1,0 +1,133 @@
+/* 변수 정의 */
+:root {
+    --gk-up: #ef4444;    /* 상승: 빨간색 */
+    --gk-down: #3b82f6;  /* 하락: 파란색 */
+    --gk-flat: #64748b;  /* 보합: 회색 */
+    --live: #22c55e;     /* 실시간: 초록색 */
+    --closed: #94a3b8;   /* 장마감: 회색 */
+}
+
+body {
+    background-color: #f1f5f9;
+    font-family: 'Pretendard', -apple-system, sans-serif;
+}
+
+.gk-card {
+    max-width: 650px;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+    background: #fff;
+}
+
+.gk-header {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.live-badge {
+    background: var(--gk-up);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+/* KPI 박스 스타일 */
+.kpi-box {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 1.2rem;
+    height: 100%;
+    border: 1px solid #f1f5f9;
+    transition: transform 0.2s ease;
+}
+
+.kpi-box:hover {
+    transform: translateY(-2px);
+}
+
+.kpi-label {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.kpi-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.5px;
+    margin-top: 0.2rem;
+}
+
+/* 상태 및 변화폭 */
+.status-wrap { font-size: 11px; color: #94a3b8; }
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+    background: var(--closed);
+}
+
+.delta-text { font-size: 0.85rem; font-weight: 600; margin-top: 0.3rem; }
+.up { color: var(--gk-up) !important; }
+.down { color: var(--gk-down) !important; }
+.flat { color: var(--gk-flat) !important; }
+
+.sub-info { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+
+/* 프리미엄 바 */
+.premium-box {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.premium-val { font-weight: 800; font-size: 1.3rem; }
+
+.updated-at {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-align: right;
+    padding: 1rem 1.5rem;
+}
+
+.chart-container {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.tradingview-widget-container {
+    position: relative;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #f1f5f9;
+}
+
+.status-badge {
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: white;
+}
+
+.bg-good { background-color: #22c55e; }    /* 매수 유리 (저렴) */
+.bg-normal { background-color: #64748b; }  /* 보통 (평균 수준) */
+.bg-caution { background-color: #f59e0b; } /* 주의 (비쌈) */
+.bg-danger { background-color: #ef4444; }  /* 위험 (고점) */

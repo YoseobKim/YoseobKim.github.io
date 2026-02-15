@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 금 시세 대시보드</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  </head>
+  <body>
+    <div class="container py-5">
+      <div class="gk-card mx-auto">
+        <header class="gk-header d-flex justify-content-between align-items-center">
+          <div>
+            <span class="live-badge">LIVE</span>
+            <h1 class="h5 d-inline m-0 fw-bold">실시간 금 가격</h1>
+          </div>
+          <div class="btn-group" role="group">
+            <input type="radio" class="btn-check" name="unit" id="u-g" value="g" checked>
+            <label class="btn btn-outline-dark" for="u-g">1g</label>
+            <input type="radio" class="btn-check" name="unit" id="u-don" value="don">
+            <label class="btn btn-outline-dark" for="u-don">1돈 (3.75 g)</label>
+          </div>
+        </header>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <div class="kpi-box">
+                <div class="d-flex justify-content-between align-items-start">
+                  <span class="kpi-label">국내 금시세 (1 g / KRW)</span>
+                  <small id="st-krx" class="status-wrap">
+                    <span class="status-dot"></span>
+                    <b>-</b>
+                  </small>
+                </div>
+                <div class="kpi-value" id="val-krx">-</div>
+                <div class="delta-text" id="delta-krx">-</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="kpi-box">
+                <div class="d-flex justify-content-between align-items-start">
+                  <span class="kpi-label">국제 금시세</span>
+                  <small id="st-intl" class="status-wrap">
+                    <span class="status-dot"></span>
+                    <b>-</b>
+                  </small>
+                </div>
+                <div class="kpi-value" id="val-intl-krw">-</div>
+                <div class="delta-text" id="delta-intl">-</div>
+                <hr class="my-2" style="opacity: 0.1;">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="text-secondary" style="font-size: 0.75rem;">1g 당 달러</span>
+                  <div class="fw-bold text-dark" id="val-intl-usd" style="font-size: 1.1rem;">-</div>
+                </div>
+                <div class="sub-info text-end" id="usd-oz-info" style="font-size: 0.7rem;">-</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="kpi-box">
+                <div class="d-flex justify-content-between align-items-start">
+                  <span class="kpi-label">환율(1$)</span>
+                  <small id="st-fx" class="status-wrap">
+                    <span class="status-dot"></span>
+                    <b>-</b>
+                  </small>
+                </div>
+                <div class="kpi-value" id="val-fx">-</div>
+                <div class="delta-text" id="delta-fx">-</div>
+              </div>
+            </div>
+          </div>
+          <div class="premium-box flex-column align-items-stretch">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="text-secondary small fw-bold">실시간 괴리율</span>
+              <div id="kimp-status" class="status-badge">분석 중...</div>
+            </div>
+            <div class="d-flex justify-content-between align-items-end">
+              <div>
+                <div class="premium-val" id="kimp-val" style="font-size: 1.4rem;">-</div>
+                <div class="small fw-bold" id="kimp-price-diff" style="margin-top: -2px;">-</div>
+              </div>
+              <div class="text-secondary small text-end">
+                <span id="kimp-avg-info">평균 0.5% 기준</span>
+                <br>
+                <span style="font-size: 0.7rem;">(국내 시세 - 국제 환산가)</span>
+              </div>
+            </div>
+            <div id="fx-value-status" class="mt-2 rounded p-2" style="display:none;">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span id="fx-status-text" class="fw-bold" style="font-size: 0.8rem;">-</span>
+                <span id="fx-diff-badge" class="badge rounded-pill" style="font-size: 0.65rem;">-</span>
+              </div>
+              <div class="text-start opacity-75" style="font-size: 0.7rem;"> 250일 평균: <span id="fx-avg-val" class="fw-bold">분석중</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-container mt-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="m-0 fw-bold text-secondary" style="font-size: 0.9rem;">괴리율 추이 & 기준선</h6>
+            <div class="btn-group btn-group-sm" role="group">
+              <button type="button" class="btn btn-outline-secondary" onclick="changeChartPeriod('2y')">2년</button>
+              <button type="button" class="btn btn-outline-secondary" onclick="changeChartPeriod('10y')">10년</button>
+              <button type="button" class="btn btn-outline-secondary" onclick="changeChartPeriod('all')">전체</button>
+            </div>
+          </div>
+          <div id="premium-chart" style="width: 100%; height: 320px;"></div>
+        </div>
+        <div class="chart-container mt-4 mb-4">
+          <h6 class="m-0 fw-bold text-secondary mb-3" style="font-size: 0.9rem;">실시간 환율 차트 (USD/KRW)</h6>
+          <div class="tradingview-widget-container" style="height: 400px;">
+            <div id="tradingview_usdkrw" style="height: 100%;"></div>
+          </div>
+        </div>
+      </div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script src="script.js"></script>
+  </body>
+</html>
