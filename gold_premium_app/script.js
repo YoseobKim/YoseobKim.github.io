@@ -283,7 +283,8 @@ window.addEventListener('resize', () => {
 async function fetchRealTimeFinancialData() {
     try {
         // 1. 국제 금 스팟 시세 (GoldPrice.org의 숨겨진 JSON 엔드포인트)
-        const goldUrl = 'https://data-asg.goldprice.org/dbXRates/USD';
+//        const goldUrl = 'https://data-asg.goldprice.org/dbXRates/USD';
+        const goldUrl = 'https://corsproxy.io/?' + encodeURIComponent('https://data-asg.goldprice.org/dbXRates/USD');
         
         // 2. 실시간 환율 (Manana의 환율 정보는 비교적 정확하므로 유지)
         const fxUrl = 'https://api.manana.kr/exchange/rate/KRW/USD.json';
