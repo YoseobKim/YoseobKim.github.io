@@ -294,21 +294,25 @@ async function fetchRealTimeFxFinancialData() {
     }
 }
 
+function XauCallback(goldData) {
+    // 국제 금값 파싱
+    // 응답 예시: { "items": [ { "curr": "USD", "xauPrice": 2345.50, ... } ] }
+    if (goldData.items && goldData.items.length > 0) {
+        const spotPrice = goldData.items[0].xauPrice;
+        apiData.xauPrice = parseFloat(spotPrice);
+        console.log(`국제 금 스팟 시세 갱신: $${apiData.xauPrice}`);
+    }
+}
+
 async function fetchRealTimeXauFinancialData() {
     try {
         // 국제 금 스팟 시세 (GoldPrice.org의 숨겨진 JSON 엔드포인트)
         const goldUrl = 'https://data-asg.goldprice.org/dbXRates/USD';
-        const goldUrlProxy = 'https://corsproxy.io/?' + encodeURIComponent(goldUrl);
-        const goldRes = await fetch(goldUrlProxy, { cache: 'no-store' });
-        const goldData = await goldRes.json();
-
-        // 국제 금값 파싱
-        // 응답 예시: { "items": [ { "curr": "USD", "xauPrice": 2345.50, ... } ] }
-        if (goldData.items && goldData.items.length > 0) {
-            const spotPrice = goldData.items[0].xauPrice;
-            apiData.xauPrice = parseFloat(spotPrice);
-            console.log(`국제 금 스팟 시세 갱신: $${apiData.xauPrice}`);
-        }
+        const goldUrlProxy = 'https://corsproxy.io/?' + encodeURIComponent(goldUrl) + '?callback=XauCallback';
+        $.ajax({
+            url: goldUrlProxy,
+            dataType: 'jsonp',
+        });
     } catch (e) {
         console.error("데이터 로드 실패 (GoldPrice.org):", e);
     }
