@@ -1,7 +1,6 @@
 /**
  * 실시간 금 가격 + Manana 실시간 환율 반영 스크립트
  */
-
 const nf0 = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 0 });
 const nf2 = new Intl.NumberFormat('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const usd2 = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -10,6 +9,13 @@ let apiData = {
     latest: null,
     xauPrice: 0,
     realTimeUsdKrw: 0
+};
+
+let referenceData = {
+    date: '',
+    krx: 0,
+    intl_usd: 0,
+    fx: 0
 };
 
 // Premium Chart
@@ -259,7 +265,7 @@ function evaluateValue(currentFx, currentXau, currentKimp) {
 }
 
 // 2. 괴리율 시리즈 데이터 가져오기 및 차트 업데이트
-async function updatePremiumChart() {
+async function load_gold_premium_series() {
 //    const SERIES_URL = 'https://goldkimp.com/wp-content/uploads/json/gold_premium_series.json';
     const SERIES_URL = 'json/gold_premium_series.json';
     
@@ -321,6 +327,15 @@ async function fetchRealTimeXauFinancialData() {
 /**
  * 2. 프리미엄(괴리율) 실시간 재계산 및 UI 업데이트
  */
+function getLiveDelta(current, reference) {
+    const diff = current - reference;
+    const pct = (diff / reference) * 100;
+    return {
+        diff: diff,
+        pct: pct
+    };
+}
+
 function renderUI() {
     const L = apiData.latest;
     if (!L) return;
@@ -346,15 +361,19 @@ function renderUI() {
     document.getElementById('val-intl-krw').textContent = nf0.format(Math.round(realTimeIntlKrw * scale));
     
     // (B) 1g 당 USD 표시 (달러는 보통 g 단위로만 보므로 scale 제외하거나 필요시 적용)
-    document.getElementById('val-intl-usd').textContent = `$${usd2.format(intlPriceG_Usd * scale)}`;
+    document.getElementById('val-intl-usd').textContent = `$${usd2.format(intlPriceG_Usd)}`;
     
     // (C) 참고용 온스($/oz) 정보
     document.getElementById('usd-oz-info').textContent = `${usd2.format(currentXau)} $/oz`;
 
     // 델타 및 프리미엄 재계산
-    renderDelta('delta-krx', L.delta?.krxkrw, 'krx', scale);
-    renderDelta('delta-intl', L.delta?.intl_g, 'intl', scale);
-    renderDelta('delta-fx', L.delta?.usdkrw, 'fx', 1);
+    const krxDelta = getLiveDelta(L.krxkrw , referenceData.krx);
+    const referenceIntlPriceG_Usd = referenceData.intl_usd / ozToG; // 1g 당 USD
+    const intlDelta = getLiveDelta(realTimeIntlKrw, referenceIntlPriceG_Usd * referenceData.fx);
+    const fxDelta = getLiveDelta(currentFx, referenceData.fx);
+    displayDeltaWithRef('delta-krx', 'ref-krx', krxDelta, referenceData.krx, scale);
+    displayDeltaWithRef('delta-intl', 'ref-intl', intlDelta, referenceIntlPriceG_Usd * referenceData.fx, scale);
+    displayDeltaWithRef('delta-fx', 'ref-fx', fxDelta, referenceData.fx, 1);
 
     const currentKrxPrice = L.krxkrw * scale;
     const currentIntlKrwPrice = realTimeIntlKrw * scale;
@@ -381,7 +400,29 @@ function renderUI() {
 /**
  * 3. 공통 함수들 (이전과 동일)
  */
+function displayDeltaWithRef(elementId, refElementId, deltaObj, refValue, scale = 1) {
+    const deltaEl = document.getElementById(elementId);
+    const refEl = document.getElementById(refElementId);
+    
+    const { diff, pct } = deltaObj;
+    const sign = diff > 0 ? '▲' : diff < 0 ? '▼' : '';
+    const colorClass = diff > 0 ? 'text-danger' : diff < 0 ? 'text-primary' : 'text-secondary';
+    
+    // 1. 델타 수치 표시
+    deltaEl.innerHTML = `
+        <span class="${colorClass} fw-bold" style="font-size: 0.85rem;">
+            ${sign} ${nf0.format(Math.abs(diff * scale))}원 (${pct.toFixed(2)}%)
+        </span>`;
+
+    // 2. 기준 정보 표시 (날짜 및 당시 가격)
+    // 환율의 경우 scale이 1이므로 '원'만 붙이고, 금은 단위(돈/g)에 따라 변환
+    const formattedRefPrice = scale === 3.75 ? nf0.format(refValue * scale) + '원' : nf2.format(refValue * scale) + '원';
+    
+    refEl.innerHTML = `기준: ${referenceData.date} (${formattedRefPrice})`;
+}
+
 function renderDelta(id, deltaObj, type, scale = 1) {
+    console.log(deltaObj);
     const el = document.getElementById(id);
     if (!el || !deltaObj) return;
     const diff = Number(deltaObj.diff) * scale;
@@ -401,6 +442,14 @@ async function initFetch() {
         const data = await response.json();
         
         apiData.latest = data.latest;
+
+        const prevLatestRow = fullChartData.recent_daily.rows[fullChartData.recent_daily.rows.length - 1];
+        referenceData = {
+            date: prevLatestRow[0],
+            krx: parseFloat(prevLatestRow[1]),      // 국내 금 종가
+            intl_usd: parseFloat(prevLatestRow[2]), // 국제 금 종가 ($/oz)
+            fx: parseFloat(prevLatestRow[3])       // 환율 종가
+        };
         const H = {}; 
         data.header.forEach((key, i) => H[key] = i);
         const lastRow = data.rows[data.rows.length - 1];
@@ -411,7 +460,6 @@ async function initFetch() {
         await fetchRealTimeXauFinancialData();
 
         if (!premiumChart) initPremiumChart();
-        updatePremiumChart();
         if (!document.getElementById('tradingview_usdkrw').hasChildNodes()) {
             initTradingViewWidget();
         }
@@ -423,8 +471,9 @@ async function initFetch() {
 }
 
 // 초기 구동 및 주기적 갱신 설정
+load_gold_premium_series();
 initFetch();
-setInterval(initFetch, 60000);
+//setInterval(initFetch, 60000);
 setInterval(fetchRealTimeFxFinancialData, 10000);
 setInterval(fetchRealTimeXauFinancialData, 10000);
 setInterval(renderUI, 5000);
