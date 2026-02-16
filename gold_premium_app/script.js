@@ -280,45 +280,36 @@ window.addEventListener('resize', () => {
     if (premiumChart) premiumChart.resize();
 });
 
-async function fetchRealTimeFinancialData() {
+async function fetchRealTimeFxFinancialData() {
     try {
-        // 1. 국제 금 스팟 시세 (GoldPrice.org의 숨겨진 JSON 엔드포인트)
-        const goldUrl = 'https://data-asg.goldprice.org/dbXRates/USD';
-//        const goldUrl = 'https://corsproxy.io/?' + encodeURIComponent(goldUrl);
-        const goldUrlProxy = `https://api.allorigins.win/get?url=${encodeURIComponent(goldUrl)}`;
-        
-        // 2. 실시간 환율 (Manana의 환율 정보는 비교적 정확하므로 유지)
         const fxUrl = 'https://api.manana.kr/exchange/rate/KRW/USD.json';
-
-        const [goldRes, fxRes] = await Promise.all([
-            fetch(goldUrlProxy, {
-                method: 'GET',
-                headers: { 'Accept': 'application/json' }
-            }),
-            fetch(fxUrl)
-        ]);
-
-        const goldData = await goldRes.json();
+        const fxRes = await fetch(fxUrl, { cache: 'no-store' });
         const fxData = await fxRes.json();
+        // 환율 파싱
+        if (fxData && fxData.length > 0) {
+            apiData.realTimeUsdKrw = parseFloat(fxData[0].rate);
+        }
+    } catch (e) {
+        console.error("데이터 로드 실패 (Manana):", e);
+    }
+}
 
-        // (A) 국제 금값 파싱
+async function fetchRealTimeXauFinancialData() {
+    try {
+        // 국제 금 스팟 시세 (GoldPrice.org의 숨겨진 JSON 엔드포인트)
+        const goldUrl = 'https://data-asg.goldprice.org/dbXRates/USD';
+        const goldRes = await fetch(goldUrl, { cache: 'no-store' });
+        const goldData = await goldRes.json();
+
+        // 국제 금값 파싱
         // 응답 예시: { "items": [ { "curr": "USD", "xauPrice": 2345.50, ... } ] }
         if (goldData.items && goldData.items.length > 0) {
             const spotPrice = goldData.items[0].xauPrice;
             apiData.xauPrice = parseFloat(spotPrice);
             console.log(`국제 금 스팟 시세 갱신: $${apiData.xauPrice}`);
         }
-
-        // (B) 환율 파싱
-        if (fxData && fxData.length > 0) {
-            apiData.realTimeUsdKrw = parseFloat(fxData[0].rate);
-        }
-
-        // UI 갱신 및 가치 판단 실행
-        renderUI(); 
-        
     } catch (e) {
-        console.error("데이터 로드 실패 (GoldPrice.org/Manana):", e);
+        console.error("데이터 로드 실패 (GoldPrice.org):", e);
     }
 }
 
@@ -411,7 +402,8 @@ async function initFetch() {
         apiData.xauPrice = Number(lastRow[H.xauusd_oz]);
 
         // 금값 가져온 직후 실시간 환율도 동기화
-        await fetchRealTimeFinancialData();
+        await fetchRealTimeFxFinancialData();
+        await fetchRealTimeXauFinancialData();
 
         if (!premiumChart) initPremiumChart();
         updatePremiumChart();
@@ -428,8 +420,9 @@ async function initFetch() {
 // 초기 구동 및 주기적 갱신 설정
 initFetch();
 setInterval(initFetch, 60000);
-setInterval(fetchRealTimeFinancialData, 10000);
-setInterval(renderUI, 10000);
+setInterval(fetchRealTimeFxFinancialData, 10000);
+setInterval(fetchRealTimeXauFinancialData, 10000);
+setInterval(renderUI, 5000);
 
 // 단위 변경 이벤트
 document.querySelectorAll('input[name="unit"]').forEach(radio => {
