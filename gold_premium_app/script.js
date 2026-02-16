@@ -291,7 +291,7 @@ async function fetchRealTimeFinancialData() {
         const fxUrl = 'https://api.manana.kr/exchange/rate/KRW/USD.json';
 
         const [goldRes, fxRes] = await Promise.all([
-            fetch(goldUrl, {
+            fetch(goldUrlProxy, {
                 method: 'GET',
                 headers: { 'Accept': 'application/json' }
             }),
@@ -429,6 +429,7 @@ async function initFetch() {
 initFetch();
 setInterval(initFetch, 60000);
 setInterval(fetchRealTimeFinancialData, 10000);
+setInterval(renderUI, 10000);
 
 // 단위 변경 이벤트
 document.querySelectorAll('input[name="unit"]').forEach(radio => {
