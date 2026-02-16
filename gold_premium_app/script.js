@@ -335,9 +335,9 @@ function renderUI() {
 
     // 1. 환율 결정 (Manana 실시간 또는 기본값)
     const currentFx = apiData.realTimeUsdKrw || L.usdkrw;
-
+    const currentXau = apiData.xauPrice || L.xauusd_oz;
     // 2. 국제 시세 계산 (1g 기준)
-    const intlPriceG_Usd = apiData.xauPrice / ozToG; // 1g 당 USD
+    const intlPriceG_Usd = currentXau / ozToG; // 1g 당 USD
     const realTimeIntlKrw = intlPriceG_Usd * currentFx; // 1g 당 KRW
 
     // --- 국내 금시세 & 환율 업데이트 (기존 코드와 동일) ---
@@ -352,7 +352,7 @@ function renderUI() {
     document.getElementById('val-intl-usd').textContent = `$${usd2.format(intlPriceG_Usd * scale)}`;
     
     // (C) 참고용 온스($/oz) 정보
-    document.getElementById('usd-oz-info').textContent = `${usd2.format(apiData.xauPrice)} $/oz`;
+    document.getElementById('usd-oz-info').textContent = `${usd2.format(currentXau)} $/oz`;
 
     // 델타 및 프리미엄 재계산
     renderDelta('delta-krx', L.delta?.krxkrw, 'krx', scale);
@@ -378,7 +378,7 @@ function renderUI() {
     kv.className = `premium-val ${statusClass}`;
     kd.className = `small fw-bold ${statusClass}`;
 
-    evaluateValue(apiData.realTimeUsdKrw, apiData.xauPrice, realTimeKimpPct);
+    evaluateValue(currentFx, currentXau, realTimeKimpPct);
 }
 
 /**
