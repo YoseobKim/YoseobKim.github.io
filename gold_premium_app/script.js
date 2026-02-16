@@ -298,7 +298,8 @@ async function fetchRealTimeXauFinancialData() {
     try {
         // 국제 금 스팟 시세 (GoldPrice.org의 숨겨진 JSON 엔드포인트)
         const goldUrl = 'https://data-asg.goldprice.org/dbXRates/USD';
-        const goldRes = await fetch(goldUrl, { cache: 'no-store' });
+        const goldUrlProxy = 'https://corsproxy.io/?' + encodeURIComponent(goldUrl);
+        const goldRes = await fetch(goldUrlProxy, { cache: 'no-store' });
         const goldData = await goldRes.json();
 
         // 국제 금값 파싱
