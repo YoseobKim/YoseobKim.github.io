@@ -149,39 +149,69 @@ function initTradingViewWidget() {
             {"id": "RSI@tv-basicstudies"}
         ]
     });
+
+    new TradingView.widget({
+        "autosize": true,
+        "symbol": "OANDA:XAUUSD",
+        "interval": "D",
+        "timezone": "Asia/Seoul",
+        "theme": "light",
+        "style": "1",
+        "locale": "kr",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "hide_top_toolbar": false,
+        "hide_legend": false,
+        "save_image": false,
+        "container_id": "tradingview_xauusd",
+        "studies": [
+            { "id": "MASimple@tv-basicstudies", "inputs": { "length": 60 } },
+            { "id": "MASimple@tv-basicstudies", "inputs": { "length": 120 } },
+            { "id": "MASimple@tv-basicstudies", "inputs": { "length": 250 } },
+            {"id": "BB@tv-basicstudies"},
+            {"id": "RSI@tv-basicstudies"}
+        ]
+    });
 }
 
-function getFxLongTermAverage() {
-    if (!fullChartData || !fullChartData.weekly) return 1350;
+function getLongTermAverages() {
+    if (!fullChartData || !fullChartData.weekly) return [0, 0];
 
     const rows = fullChartData.recent_daily.rows;
-    // 인덱스 3이 환율(fx) 종가입니다.
+    // 인덱스 3이 환율(fx) 종가
+    // 인덱스 2이 XAU 종가
     const recentRows = rows.slice(-250); 
-    const sum = recentRows.reduce((acc, row) => acc + parseFloat(row[3]), 0);
+    const fx_sum = recentRows.reduce((acc, row) => acc + parseFloat(row[3]), 0);
+    const xau_sum = recentRows.reduce((acc, row) => acc + parseFloat(row[2]), 0);
     
-    return sum / recentRows.length;
+    return [fx_sum / recentRows.length, xau_sum / recentRows.length];
 }
 
-function evaluateValue(currentFx, currentKimp) {
-    const fxAvg = getFxLongTermAverage();
+function evaluateValue(currentFx, currentXau, currentKimp) {
+    const [fxAvg, xauAvg] = getLongTermAverages();
+    if (fxAvg <= 0 || xauAvg <= 0) return;
     const fxStatusEl = document.getElementById('fx-value-status');
     const fxStatusText = document.getElementById('fx-status-text');
     const fxDiffBadge = document.getElementById('fx-diff-badge');
     const fxAvgVal = document.getElementById('fx-avg-val');
     const kimpStatusEl = document.getElementById('kimp-status');
+    const xauStatusEl = document.getElementById('xau-value-status');
+    const xauStatusText = document.getElementById('xau-status-text');
+    const xauDiffBadge = document.getElementById('xau-diff-badge');
+    const xauAvgVal = document.getElementById('xau-avg-val');
 
-    // 1. 환율 판단 (평균 대비 편차 계산)
+    // 환율 판단 (평균 대비 편차 계산)
     const fxDiffPct = ((currentFx - fxAvg) / fxAvg) * 100;
     
     fxStatusEl.style.display = 'block';
     fxAvgVal.textContent = `${nf2.format(fxAvg)}원`; // 평균값 표시
     // 평균보다 2% 이상 낮으면 매수 유리, 5% 이상 높으면 주의
     if (fxDiffPct < -2) {
-        fxStatusText.textContent = "환율 저평가 (매수 유리)";
+        fxStatusText.textContent = "환율 저평가";
         fxStatusEl.className = "mt-2 rounded p-2 bg-success text-white"; // bg-good 대응
         fxDiffBadge.className = "badge rounded-pill bg-white text-success";
     } else if (fxDiffPct > 5) {
-        fxStatusText.textContent = "환율 고평가 (주의)";
+        fxStatusText.textContent = "환율 고평가";
         fxStatusEl.className = "mt-2 rounded p-2 bg-danger text-white"; // bg-danger 대응
         fxDiffBadge.className = "badge rounded-pill bg-white text-danger";
     } else {
@@ -191,7 +221,28 @@ function evaluateValue(currentFx, currentKimp) {
     }
     fxDiffBadge.textContent = `${fxDiffPct > 0 ? '+' : ''}${fxDiffPct.toFixed(1)}%`;
 
-    // 2. 괴리율 판단 (장기 평균 0.5% 기준)
+    // 국제 금 가격 판단 (평균 대비 편차 계산)
+    const xauDiffPct = ((currentXau - xauAvg) / xauAvg) * 100;
+    
+    xauStatusEl.style.display = 'block';
+    xauAvgVal.textContent = `${nf2.format(xauAvg)} 달러`; // 평균값 표시
+    // 평균보다 2% 이상 낮으면 매수 유리, 5% 이상 높으면 주의
+    if (xauDiffPct < -2) {
+        xauStatusText.textContent = "금값 저평가";
+        xauStatusEl.className = "mt-2 rounded p-2 bg-success text-white"; // bg-good 대응
+        xauDiffBadge.className = "badge rounded-pill bg-white text-success";
+    } else if (xauDiffPct > 5) {
+        xauStatusText.textContent = "금값 고평가";
+        xauStatusEl.className = "mt-2 rounded p-2 bg-danger text-white"; // bg-danger 대응
+        xauDiffBadge.className = "badge rounded-pill bg-white text-danger";
+    } else {
+        xauStatusText.textContent = "금값 적정 수준";
+        xauStatusEl.className = "mt-2 rounded p-2 bg-secondary text-white"; // bg-normal 대응
+        xauDiffBadge.className = "badge rounded-pill bg-white text-secondary";
+    }
+    xauDiffBadge.textContent = `${xauDiffPct > 0 ? '+' : ''}${xauDiffPct.toFixed(1)}%`;
+
+    // 괴리율 판단 (장기 평균 0.5% 기준)
     const KIMP_TARGET = 0.5;
     const kimpDiff = currentKimp - KIMP_TARGET;
 
@@ -229,24 +280,43 @@ window.addEventListener('resize', () => {
     if (premiumChart) premiumChart.resize();
 });
 
-/**
- * 1. Manana API를 통한 실시간 환율 호출
- * 별도의 API KEY가 필요 없으며 호출 제한이 매우 완만합니다.
- */
-async function fetchMananaExchangeRate() {
+async function fetchRealTimeFinancialData() {
     try {
-        // Manana API: USD-KRW 환율 정보 (JSON 포맷)
-        const url = 'https://api.manana.kr/exchange/rate/KRW/USD.json';
-        const res = await fetch(url);
-        const data = await res.json();
+        // 1. 국제 금 스팟 시세 (GoldPrice.org의 숨겨진 JSON 엔드포인트)
+        const goldUrl = 'https://data-asg.goldprice.org/dbXRates/USD';
         
-        // 데이터 구조: [{ name: "USDKRW=X", rate: 1440.12, ... }]
-        if (data && data.length > 0) {
-            apiData.realTimeUsdKrw = parseFloat(data[0].rate);
-            renderUI();
+        // 2. 실시간 환율 (Manana의 환율 정보는 비교적 정확하므로 유지)
+        const fxUrl = 'https://api.manana.kr/exchange/rate/KRW/USD.json';
+
+        const [goldRes, fxRes] = await Promise.all([
+            fetch(goldUrl, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            }),
+            fetch(fxUrl)
+        ]);
+
+        const goldData = await goldRes.json();
+        const fxData = await fxRes.json();
+
+        // (A) 국제 금값 파싱
+        // 응답 예시: { "items": [ { "curr": "USD", "xauPrice": 2345.50, ... } ] }
+        if (goldData.items && goldData.items.length > 0) {
+            const spotPrice = goldData.items[0].xauPrice;
+            apiData.xauPrice = parseFloat(spotPrice);
+            console.log(`국제 금 스팟 시세 갱신: $${apiData.xauPrice}`);
         }
+
+        // (B) 환율 파싱
+        if (fxData && fxData.length > 0) {
+            apiData.realTimeUsdKrw = parseFloat(fxData[0].rate);
+        }
+
+        // UI 갱신 및 가치 판단 실행
+        renderUI(); 
+        
     } catch (e) {
-        console.error("Manana 환율 API 호출 실패:", e);
+        console.error("데이터 로드 실패 (GoldPrice.org/Manana):", e);
     }
 }
 
@@ -307,7 +377,7 @@ function renderUI() {
     kv.className = `premium-val ${statusClass}`;
     kd.className = `small fw-bold ${statusClass}`;
 
-    evaluateValue(currentFx, realTimeKimpPct);
+    evaluateValue(apiData.realTimeUsdKrw, apiData.xauPrice, realTimeKimpPct);
 }
 
 /**
@@ -339,7 +409,7 @@ async function initFetch() {
         apiData.xauPrice = Number(lastRow[H.xauusd_oz]);
 
         // 금값 가져온 직후 실시간 환율도 동기화
-        await fetchMananaExchangeRate();
+        await fetchRealTimeFinancialData();
 
         if (!premiumChart) initPremiumChart();
         updatePremiumChart();
@@ -355,9 +425,8 @@ async function initFetch() {
 
 // 초기 구동 및 주기적 갱신 설정
 initFetch();
-setInterval(initFetch, 60000); // 1분마다 전체 데이터(금값 포함) 갱신
-setInterval(fetchMananaExchangeRate, 10000); // 환율은 10초마다 매우 민감하게 갱신
-setInterval(updatePremiumChart, 300000);
+setInterval(initFetch, 60000);
+setInterval(fetchRealTimeFinancialData, 10000);
 
 // 단위 변경 이벤트
 document.querySelectorAll('input[name="unit"]').forEach(radio => {

@@ -13,7 +13,6 @@
       <div class="gk-card mx-auto">
         <header class="gk-header d-flex justify-content-between align-items-center">
           <div>
-            <span class="live-badge">LIVE</span>
             <h1 class="h5 d-inline m-0 fw-bold">실시간 금 가격</h1>
           </div>
           <div class="btn-group" role="group">
@@ -73,8 +72,8 @@
           </div>
           <div class="premium-box flex-column align-items-stretch">
             <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="text-secondary small fw-bold">실시간 괴리율</span>
-              <div id="kimp-status" class="status-badge">분석 중...</div>
+              <span class="text-secondary small fw-bold">괴리율</span>
+              <div id="kimp-status" class="status-badge bg-normal">분석 중...</div>
             </div>
             <div class="d-flex justify-content-between align-items-end">
               <div>
@@ -82,19 +81,28 @@
                 <div class="small fw-bold" id="kimp-price-diff" style="margin-top: -2px;">-</div>
               </div>
               <div class="text-secondary small text-end">
-                <span id="kimp-avg-info">평균 0.5% 기준</span>
+                <span id="kimp-avg-info">괴리율 평균 0.5% 기준</span>
                 <br>
                 <span style="font-size: 0.7rem;">(국내 시세 - 국제 환산가)</span>
               </div>
             </div>
-            <div id="fx-value-status" class="mt-2 rounded p-2" style="display:none;">
+            <div id="fx-value-status" class="mt-2 rounded p-2 bg-light text-dark" style="display:block;">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <span id="fx-status-text" class="fw-bold" style="font-size: 0.8rem;">-</span>
-                <span id="fx-diff-badge" class="badge rounded-pill" style="font-size: 0.65rem;">-</span>
+                <span id="fx-status-text" class="fw-bold" style="font-size: 0.8rem;">환율 프리미엄 분석중</span>
+                <span id="fx-diff-badge" class="badge rounded-pill" style="font-size: 0.65rem;">-0.0%</span>
               </div>
-              <div class="text-start opacity-75" style="font-size: 0.7rem;"> 250일 평균: <span id="fx-avg-val" class="fw-bold">분석중</span>
+              <div class="text-start opacity-75" style="font-size: 0.7rem;"> 250일 평균: <span id="fx-avg-val" class="fw-bold">계산중</span>
               </div>
             </div>
+            <div id="xau-value-status" class="mt-2 rounded p-2 bg-light text-dark" style="display:block;">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span id="xau-status-text" class="fw-bold" style="font-size: 0.8rem;">국제금 프리미엄 분석중</span>
+                <span id="xau-diff-badge" class="badge rounded-pill" style="font-size: 0.65rem;">-0.0%</span>
+              </div>
+              <div class="text-start opacity-75" style="font-size: 0.7rem;"> 250일 평균: <span id="xau-avg-val" class="fw-bold">계산중</span>
+              </div>
+            </div>
+
           </div>
         </div>
         <div class="chart-container mt-4 mb-4">
@@ -109,9 +117,15 @@
           <div id="premium-chart" style="width: 100%; height: 320px;"></div>
         </div>
         <div class="chart-container mt-4 mb-4">
-          <h6 class="m-0 fw-bold text-secondary mb-3" style="font-size: 0.9rem;">실시간 환율 차트 (USD/KRW)</h6>
+          <h6 class="m-0 fw-bold text-secondary mb-3" style="font-size: 0.9rem;">환율 차트 (USD/KRW)</h6>
           <div class="tradingview-widget-container" style="height: 400px;">
             <div id="tradingview_usdkrw" style="height: 100%;"></div>
+          </div>
+        </div>
+        <div class="chart-container mt-4 mb-4">
+          <h6 class="m-0 fw-bold text-secondary mb-3" style="font-size: 0.9rem;">국제 금 현물 차트 (XAU/USD)</h6>
+          <div class="tradingview-widget-container" style="height: 400px;">
+            <div id="tradingview_xauusd" style="height: 100%;"></div>
           </div>
         </div>
       </div>
